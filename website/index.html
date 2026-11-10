@@ -294,7 +294,7 @@
 
   <!-- Background Wallpaper Layer -->
   <div id="bg-container" class="absolute inset-0 transition-all duration-1000"
-       style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop'); background-size: cover; background-position: center center; background-repeat: no-repeat; filter: brightness(0.65);">
+       style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=70&w=1600&auto=format&fit=crop'); background-size: cover; background-position: center center; background-repeat: no-repeat; filter: brightness(0.65);">
   </div>
   <div id="bg-overlay" class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/55 pointer-events-none"></div>
 
@@ -459,7 +459,7 @@
       <div class="flex items-center gap-3 min-w-0">
         <div id="vinyl-container" class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border border-white/15 shadow-lg cursor-pointer">
           <div id="vinyl-disc" class="w-full h-full animate-spin-slow" style="animation-play-state: paused;">
-            <img id="vinyl-artwork" src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=400&auto=format&fit=crop"
+            <img id="vinyl-artwork" src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=65&w=160&auto=format&fit=crop"
                  alt="Track Artwork" class="w-full h-full object-cover">
           </div>
         </div>
@@ -2061,7 +2061,7 @@
       // Update background with smooth fade — keep proper cover sizing, no zoom
       const bg = document.getElementById('bg-container');
       if (bg) {
-        bg.style.backgroundImage = `url('${st.bg}')`;
+        bg.style.backgroundImage = `url('${getStationBackgroundUrl(st.bg)}')`;
         bg.style.backgroundSize = 'cover';
         bg.style.backgroundPosition = 'center center';
         bg.style.backgroundRepeat = 'no-repeat';
@@ -2086,7 +2086,7 @@
       if (pFx) pFx.textContent = `${st.fx.toUpperCase()} FX`;
 
       const vinylArt = document.getElementById('vinyl-artwork');
-      if (vinylArt) vinylArt.src = st.bg;
+      if (vinylArt) vinylArt.src = getStationThumbnailUrl(st.bg);
 
       // Update Header Badge
       const hTrackNum = document.getElementById('header-track-num');
@@ -2342,6 +2342,25 @@
     }
 
     // --- Station Library Drawer Rendering ---
+    function getStationImageUrl(src, width, quality) {
+      const url = new URL(src, document.baseURI);
+      if (url.hostname === 'images.unsplash.com') {
+        url.searchParams.set('w', String(width));
+        url.searchParams.set('q', String(quality));
+      } else if (url.hostname === 'cdn.pixabay.com') {
+        url.pathname = url.pathname.replace(/_1280(?=\.jpg$)/, '_640');
+      }
+      return url.href;
+    }
+
+    function getStationThumbnailUrl(src) {
+      return getStationImageUrl(src, 160, 65);
+    }
+
+    function getStationBackgroundUrl(src) {
+      return getStationImageUrl(src, 1600, 70);
+    }
+
     function renderStationList() {
       const container = document.getElementById('station-list');
       container.innerHTML = '';
@@ -2366,7 +2385,7 @@
               ${st.trackNum}
             </span>
             <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-900 border border-white/10 flex-shrink-0">
-              <img src="${st.bg}" class="w-full h-full object-cover" alt="${st.title}">
+              <img src="${getStationThumbnailUrl(st.bg)}" class="w-full h-full object-cover" alt="${st.title}" loading="lazy" decoding="async" fetchpriority="low">
             </div>
             <div class="min-w-0">
               <div class="font-bold text-xs truncate ${isActive ? 'text-cyan-200' : 'text-white'}">${st.title}</div>
@@ -2807,7 +2826,6 @@
       resizeCanvas();
       renderParticles();
       renderVisualizer();
-      renderStationList();
       loadStation(currentStationIndex, false);
 
       if (window.lucide) lucide.createIcons();
