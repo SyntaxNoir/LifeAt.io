@@ -1,0 +1,3128 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full select-none bg-black">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LifeAt.io • Retro Anime Lo-Fi Workspace & Station Player</title>
+  
+  <!-- PWA & Mobile Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#00f2fe">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LifeAt.io">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+            retro: ['"Press Start 2P"', 'monospace'],
+            vt: ['"VT323"', 'monospace']
+          },
+          colors: {
+            neon: {
+              pink: '#ff2a85',
+              cyan: '#00f2fe',
+              amber: '#ffbe0b',
+              purple: '#8b5cf6',
+              green: '#10b981'
+            }
+          },
+          animation: {
+            'spin-slow': 'spin 18s linear infinite',
+            'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+            'float': 'float 4s ease-in-out infinite'
+          },
+          keyframes: {
+            pulseGlow: {
+              '0%, 100%': { opacity: 1, filter: 'drop-shadow(0 0 10px rgba(0,242,254,0.6))' },
+              '50%': { opacity: 0.6, filter: 'drop-shadow(0 0 3px rgba(0,242,254,0.2))' }
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-6px)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.4);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 242, 254, 0.5);
+    }
+
+    /* CRT Scanline Overlay */
+    .crt-overlay {
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%),
+                  linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      background-size: 100% 4px, 6px 100%;
+      box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.7);
+    }
+    .crt-flicker {
+      animation: crtFlicker 0.12s infinite;
+    }
+    @keyframes crtFlicker {
+      0% { opacity: 0.98; }
+      50% { opacity: 1; }
+      100% { opacity: 0.97; }
+    }
+
+    /* Vinyl Record Styling */
+    .vinyl-grooves {
+      background: radial-gradient(circle, #1a1a1a 18%, #111 20%, #222 21%, #111 24%, #222 25%, #111 29%, #262626 30%, #111 34%, #222 35%, #111 40%, #262626 41%, #111 48%, #1a1a1a 50%, #0d0d0d 68%, #1f1f1f 70%, #0a0a0a 100%);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.8), inset 0 0 10px rgba(255,255,255,0.08);
+    }
+    .vinyl-sheen {
+      background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 45%, rgba(255,255,255,0.12) 55%, rgba(255,255,255,0) 100%);
+    }
+
+    /* Glassmorphism Classes */
+    .glass-panel {
+      background: rgba(10, 12, 20, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+    .glass-button {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-button:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(0, 242, 254, 0.5);
+      transform: translateY(-1px);
+    }
+    .glass-button:active {
+      transform: translateY(1px);
+    }
+
+    /* Range Slider Styling */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 9999px;
+      height: 5px;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #00f2fe;
+      cursor: pointer;
+      box-shadow: 0 0 8px #00f2fe;
+      transition: transform 0.1s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+    }
+
+    /* Auto Fade Transitions */
+    .ui-layer {
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .ui-hidden {
+      opacity: 0 !important;
+      pointer-events: none !important;
+      transform: scale(0.98) !important;
+    }
+    #bg-container {
+      animation: backgroundDrift 32s ease-in-out infinite alternate;
+      will-change: transform;
+    }
+    #player-card {
+      position: relative;
+      isolation: isolate;
+      overflow: visible;
+    }
+    #player-card > * {
+      position: relative;
+      z-index: 1;
+    }
+    #player-card::before {
+      content: "";
+      position: absolute;
+      inset: -28%;
+      z-index: 0;
+      pointer-events: none;
+      background: conic-gradient(from 0deg, transparent 0 26%, rgba(0, 242, 254, 0.42) 38%, rgba(255, 42, 133, 0.36) 48%, transparent 62% 100%);
+      filter: blur(28px);
+      mix-blend-mode: screen;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    #player-card.is-playing::before {
+      opacity: 0.8;
+      animation: playerAuraSpin 10s linear infinite;
+    }
+    #player-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      width: 35%;
+      height: 1px;
+      pointer-events: none;
+      opacity: 0;
+      background: linear-gradient(90deg, transparent, rgba(0, 242, 254, 0.95), rgba(255, 42, 133, 0.85), transparent);
+      filter: drop-shadow(0 0 5px rgba(0, 242, 254, 0.8));
+    }
+    #player-card.is-playing::after {
+      opacity: 1;
+      animation: playerScan 3.8s ease-in-out infinite;
+    }
+    #btn-play-pause {
+      position: relative;
+      isolation: isolate;
+    }
+    #btn-play-pause > * {
+      position: relative;
+      z-index: 1;
+    }
+    #btn-play-pause::after {
+      content: "";
+      position: absolute;
+      inset: -4px;
+      z-index: 0;
+      border: 1px solid rgba(0, 242, 254, 0.8);
+      border-radius: 15px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    #player-card.is-playing #btn-play-pause::after {
+      animation: playPulse 1.8s ease-out infinite;
+    }
+    @keyframes playerAuraSpin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes playerScan {
+      0% { transform: translateX(-10%); }
+      75%, 100% { transform: translateX(300%); }
+    }
+    @keyframes playPulse {
+      0% { transform: scale(0.9); opacity: 0.85; }
+      100% { transform: scale(1.65); opacity: 0; }
+    }
+    @keyframes backgroundDrift {
+      0% { transform: scale(1.02) translate3d(0, 0, 0); }
+      100% { transform: scale(1.1) translate3d(-1.5%, 1%, 0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #bg-container,
+      #player-card::before,
+      #player-card.is-playing::after,
+      #player-card.is-playing::before,
+      #player-card.is-playing #btn-play-pause::after {
+        animation: none;
+      }
+      #player-card::before,
+      #player-card::after,
+      #player-card.is-playing::before {
+        opacity: 0 !important;
+        transition: none;
+      }
+    }
+  </style>
+  <script>
+    // Immediate early-bound unlockAndStart handler
+    window.unlockAndStart = function(e) {
+      if (window._hasStarted) return;
+      window._hasStarted = true;
+      
+      const overlay = document.getElementById('start-overlay');
+      if (overlay) {
+        overlay.style.transition = 'opacity 0.6s ease';
+        overlay.style.opacity = '0';
+        overlay.style.pointerEvents = 'none';
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        }, 650);
+      }
+
+      if (typeof window.triggerAppStart === 'function') {
+        window.triggerAppStart();
+      } else {
+        window._pendingStart = true;
+      }
+    };
+
+    window.addEventListener('keydown', function firstKey(e) {
+      if (!window._hasStarted) {
+        window.unlockAndStart(e);
+        window.removeEventListener('keydown', firstKey);
+      }
+    });
+  </script>
+</head>
+
+<body class="relative h-full w-full overflow-hidden text-slate-100 font-sans">
+
+  <!-- Background Wallpaper Layer -->
+  <div id="bg-container" class="absolute inset-0 transition-all duration-1000"
+       style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop'); background-size: cover; background-position: center center; background-repeat: no-repeat; filter: brightness(0.65);">
+  </div>
+  <div id="bg-overlay" class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/55 pointer-events-none"></div>
+
+  <!-- Dynamic Particle Canvas FX Layer -->
+  <canvas id="fx-canvas" class="absolute inset-0 pointer-events-none z-10"></canvas>
+
+  <!-- CRT Scanline Overlay -->
+  <div id="crt-layer" class="crt-overlay crt-flicker fixed inset-0 pointer-events-none z-50 hidden"></div>
+
+  <!-- ========================================================================= -->
+  <!-- 1. INITIAL START OVERLAY (Autoplay Policy Workaround) -->
+  <!-- ========================================================================= -->
+  <div id="start-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 bg-black/80 backdrop-blur-2xl transition-all duration-700 cursor-pointer">
+    <div class="glass-panel max-w-lg w-full p-8 rounded-3xl text-center border border-white/15 relative overflow-hidden group shadow-2xl">
+      <!-- Glow decoration -->
+      <div class="absolute -top-24 -left-24 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-pink-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-tr from-cyan-500 to-pink-500 p-0.5 shadow-lg shadow-cyan-500/30 flex items-center justify-center animate-bounce">
+        <div class="w-full h-full bg-slate-950/90 rounded-[14px] flex items-center justify-center">
+          <i data-lucide="headphones" class="w-10 h-10 text-cyan-400"></i>
+        </div>
+      </div>
+
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono tracking-widest uppercase mb-3">
+        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+        Retro Anime Lo-Fi Workspace
+      </div>
+
+      <h1 class="text-3xl font-bold tracking-tight text-white mb-2 font-mono">LifeAt.io</h1>
+      <p class="text-slate-400 text-sm mb-8 leading-relaxed">
+        100 curated aesthetic stations, animated original backgrounds, procedural weather effects, synthesized ambient soundscapes & pomodoro focus timer.
+      </p>
+
+      <button id="start-btn" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-pink-500 hover:from-cyan-400 hover:to-pink-400 text-white font-mono font-bold tracking-wider text-sm shadow-xl shadow-cyan-500/25 transition-all transform active:scale-95 flex items-center justify-center gap-3">
+        <i data-lucide="play" class="w-5 h-5 fill-current"></i>
+        PRESS ANY KEY OR CLICK TO START
+      </button>
+
+      <p class="text-[11px] text-slate-500 font-mono mt-4">
+        Clicking unlocks browser Web Audio context and starts instant stream playback
+      </p>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 2. HEADER & "NOW LISTENING" TOOLBAR -->
+  <!-- ========================================================================= -->
+  <header id="main-header" class="ui-layer fixed top-0 left-0 right-0 z-40 p-4 md:px-8 flex items-center justify-between gap-4">
+    <!-- Left: Logo & Live Clock -->
+    <div class="flex items-center gap-4">
+      <div class="glass-panel px-3.5 py-2 rounded-2xl flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-400 to-pink-500 flex items-center justify-center font-retro text-[10px] text-slate-950 font-bold shadow-md shadow-cyan-500/20">
+          ☕
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-mono font-bold text-sm tracking-wide text-white">LifeAt.io</span>
+            <span class="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[9px] font-mono text-emerald-400 uppercase">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              ON AIR
+            </span>
+          </div>
+          <div id="digital-clock" class="text-[11px] font-mono text-slate-400 tracking-wider">
+            00:00:00 --
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Dedicated "NOW LISTENING" Badge -->
+    <div class="hidden lg:flex items-center">
+      <div class="glass-panel px-5 py-2.5 rounded-2xl flex items-center gap-3 border border-white/15 shadow-xl">
+        <div class="flex items-center gap-1.5 text-cyan-400">
+          <i data-lucide="radio" class="w-4 h-4 animate-pulse"></i>
+          <span class="text-[11px] font-mono font-bold tracking-widest uppercase">NOW LISTENING</span>
+        </div>
+        <div class="w-px h-4 bg-white/20"></div>
+        <div class="flex items-center gap-2">
+          <span id="header-track-num" class="px-2 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 font-mono text-xs font-bold">
+            TRACK #01 / 100
+          </span>
+          <span id="header-track-title" class="font-medium text-xs text-white max-w-[220px] truncate">
+            Coffee & Rainy Windows
+          </span>
+        </div>
+        <!-- Live bouncing bars indicator -->
+        <div id="header-bars" class="flex items-end gap-0.5 h-3.5">
+          <span class="w-1 bg-cyan-400 rounded-full animate-pulse h-2"></span>
+          <span class="w-1 bg-cyan-400 rounded-full animate-pulse h-3.5 delay-75"></span>
+          <span class="w-1 bg-cyan-400 rounded-full animate-pulse h-1.5 delay-150"></span>
+          <span class="w-1 bg-cyan-400 rounded-full animate-pulse h-3 delay-100"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Quick Action Controls & Modals Toggle -->
+    <div class="flex items-center gap-2 md:gap-2.5">
+      <!-- PWA Install Button (Shown if browser supports PWA install) -->
+      <button id="btn-install-pwa" title="Install Desktop App" class="glass-button px-3 py-2 rounded-xl items-center gap-1.5 text-xs font-mono text-cyan-300 hidden">
+        <i data-lucide="download" class="w-4 h-4 text-cyan-400"></i>
+        <span class="hidden sm:inline">INSTALL APP</span>
+      </button>
+
+      <!-- Retro Scratchpad / Notes Toggle -->
+      <button id="btn-toggle-notes" title="Notes & To-Do Pad (N)" class="glass-button px-3 py-2 rounded-xl flex items-center gap-1.5 text-xs font-mono text-emerald-300">
+        <i data-lucide="file-text" class="w-4 h-4 text-emerald-400"></i>
+        <span class="hidden md:inline">NOTES</span>
+      </button>
+
+      <!-- Weather FX Toggle -->
+      <button id="btn-toggle-fx" title="Toggle Particle FX" class="glass-button px-3 py-2 rounded-xl flex items-center gap-1.5 text-xs font-mono text-cyan-300">
+        <i data-lucide="cloud-rain" class="w-4 h-4"></i>
+        <span class="hidden sm:inline">FX:</span>
+        <span id="fx-status-text" class="font-bold">ON</span>
+      </button>
+
+      <!-- Ambient Sound Mixer Toggle -->
+      <button id="btn-toggle-mixer" title="Soundscape Ambient Mixer (A)" class="glass-button px-3 py-2 rounded-xl flex items-center gap-1.5 text-xs font-mono text-slate-200">
+        <i data-lucide="sliders" class="w-4 h-4 text-emerald-400"></i>
+        <span class="hidden md:inline">SOUNDSCAPE</span>
+      </button>
+
+      <!-- Pomodoro Timer Button -->
+      <button id="btn-toggle-pomo" title="Pomodoro Focus Timer (P)" class="glass-button px-3 py-2 rounded-xl flex items-center gap-1.5 text-xs font-mono text-amber-300">
+        <i data-lucide="timer" class="w-4 h-4"></i>
+        <span id="header-pomo-text" class="font-bold">POMO: 25:00</span>
+      </button>
+
+      <!-- CRT Mode Toggle -->
+      <button id="btn-toggle-crt" title="CRT Retro Filter Mode (C)" class="glass-button px-3 py-2 rounded-xl flex items-center gap-1.5 text-xs font-mono text-purple-300">
+        <i data-lucide="tv" class="w-4 h-4"></i>
+        <span class="hidden sm:inline">CRT:</span>
+        <span id="crt-status-text" class="font-bold">OFF</span>
+      </button>
+
+      <!-- Custom Station Uploader -->
+      <button id="btn-toggle-upload" title="Add Custom Station" class="glass-button px-3 py-2 rounded-xl flex items-center gap-1.5 text-xs font-mono text-pink-300">
+        <i data-lucide="upload" class="w-4 h-4"></i>
+        <span class="hidden lg:inline">+ ADD</span>
+      </button>
+
+      <!-- Station Library Drawer Button -->
+      <button id="btn-toggle-drawer" title="Station Library (S)" class="glass-button px-3.5 py-2 rounded-xl flex items-center gap-2 text-xs font-mono text-white bg-white/15 border-cyan-400/30">
+        <i data-lucide="list-music" class="w-4 h-4 text-cyan-400"></i>
+        <span class="font-bold hidden sm:inline">STATIONS</span>
+        <span id="header-station-count" class="px-1.5 py-0.2 rounded bg-cyan-400/20 text-cyan-300 text-[10px]">100</span>
+      </button>
+
+      <!-- Shortcuts / Help -->
+      <button id="btn-toggle-help" title="Keyboard Shortcuts (?)" class="glass-button w-9 h-9 rounded-xl flex items-center justify-center text-xs font-mono text-slate-300">
+        ?
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- 3. MAIN PLAYER CARD & CONTROLS -->
+  <!-- ========================================================================= -->
+  <main class="fixed bottom-4 left-4 z-40 w-[min(34rem,calc(100vw-2rem))] pointer-events-none">
+    <div id="player-card" class="glass-panel pointer-events-auto w-full p-3 sm:p-4 rounded-2xl flex flex-col gap-3 shadow-2xl border border-white/15 transition-all duration-300 hover:border-cyan-400/30">
+      <div class="flex items-center gap-3 min-w-0">
+        <div id="vinyl-container" class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border border-white/15 shadow-lg cursor-pointer">
+          <div id="vinyl-disc" class="w-full h-full animate-spin-slow" style="animation-play-state: paused;">
+            <img id="vinyl-artwork" src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=400&auto=format&fit=crop"
+                 alt="Track Artwork" class="w-full h-full object-cover">
+          </div>
+        </div>
+
+        <div class="min-w-0 flex-1">
+          <h2 id="player-title" class="text-sm sm:text-base font-bold font-mono tracking-tight text-white truncate drop-shadow-md">
+            Coffee & Rainy Windows
+          </h2>
+          <p id="player-artist" class="text-xs font-medium text-slate-300 mt-0.5 flex items-center gap-1.5 min-w-0">
+            <span id="player-artist-name" class="truncate">Komorebi Sound</span>
+            <span class="text-slate-600">•</span>
+            <span id="player-vibe" class="text-cyan-400 font-mono truncate">Rainy Cafe</span>
+          </p>
+        </div>
+
+        <div class="flex flex-col items-end gap-1 flex-shrink-0">
+          <span id="player-track-badge" class="px-2 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-mono text-[10px] font-bold tracking-wider">
+            TRACK 01 OF 50
+          </span>
+          <span id="player-fx-badge" class="text-[10px] text-slate-400 font-mono">
+            <span id="player-fx-name">Rain FX</span>
+          </span>
+        </div>
+      </div>
+
+      <canvas id="visualizer-canvas" class="w-full h-4 opacity-80" width="300" height="32"></canvas>
+
+      <div class="flex items-center gap-1 sm:gap-3">
+        <div class="flex items-center gap-1 sm:gap-1.5">
+          <button id="btn-prev" title="Previous Station (Left Arrow)" class="glass-button w-9 h-9 rounded-xl flex items-center justify-center text-slate-300 hover:text-white cursor-pointer active:scale-90 transition-transform">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="19 20 9 12 19 4 19 20"></polygon>
+              <line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2.5"></line>
+            </svg>
+          </button>
+
+          <button id="btn-play-pause" title="Play / Pause (Space)" class="w-10 h-10 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-slate-950 shadow-lg shadow-cyan-400/25 transition-all flex items-center justify-center cursor-pointer active:scale-95">
+            <span id="play-pause-icon-container" class="flex items-center justify-center">
+              <svg class="w-5 h-5 fill-current text-slate-950" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="6 4 20 12 6 20 6 4"></polygon>
+              </svg>
+            </span>
+            <span id="play-pause-label" class="sr-only">RESUME</span>
+          </button>
+
+          <button id="btn-next" title="Next Station (Right Arrow)" class="glass-button w-9 h-9 rounded-xl flex items-center justify-center text-slate-300 hover:text-white cursor-pointer active:scale-90 transition-transform">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 4 15 12 5 20 5 4"></polygon>
+              <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2.5"></line>
+            </svg>
+          </button>
+
+          <button id="btn-shuffle" title="Shuffle Station" class="glass-button w-9 h-9 rounded-xl flex items-center justify-center text-slate-300 hover:text-cyan-400 cursor-pointer active:scale-90 transition-transform">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 3 21 3 21 8"></polyline>
+              <line x1="4" y1="20" x2="21" y2="3"></line>
+              <polyline points="21 16 21 21 16 21"></polyline>
+              <line x1="15" y1="15" x2="21" y2="21"></line>
+              <line x1="4" y1="4" x2="9" y2="9"></line>
+            </svg>
+          </button>
+        </div>
+
+        <button id="btn-source-mode" title="Toggle between Radio Stream and Procedural Lo-Fi Synth" class="ml-auto px-2 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 flex items-center gap-1.5 transition cursor-pointer active:scale-95">
+          <span id="source-mode-dot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span id="source-mode-text" class="hidden sm:inline text-[10px] font-mono whitespace-nowrap">RADIO STREAM</span>
+        </button>
+
+        <div class="flex items-center gap-1.5">
+          <button id="btn-mute" title="Mute / Unmute (M)" class="text-slate-400 hover:text-cyan-400 transition cursor-pointer active:scale-90 flex items-center justify-center p-1">
+            <span id="mute-icon-container" class="flex items-center justify-center">
+              <svg class="w-4 h-4 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+              </svg>
+            </span>
+          </button>
+          <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.75" oninput="setMasterVolume(this.value)" class="w-7 sm:w-20 min-w-0 cursor-pointer">
+          <span id="volume-pct" class="hidden sm:inline text-[11px] text-slate-400 w-7 text-right">75%</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- 4. STATION LIBRARY & DRAWER -->
+  <!-- ========================================================================= -->
+  <aside id="station-drawer" class="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[440px] glass-panel border-l border-white/15 transform translate-x-full transition-transform duration-400 ease-out flex flex-col shadow-2xl">
+    <!-- Drawer Header -->
+    <div class="p-5 border-b border-white/10 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <i data-lucide="radio" class="w-5 h-5 text-cyan-400"></i>
+        <h3 class="font-mono font-bold text-base text-white tracking-wide">STATION LIBRARY</h3>
+        <span id="drawer-station-count" class="text-xs font-mono px-2 py-0.5 rounded-full bg-cyan-400/20 text-cyan-300">100 TRACKS</span>
+      </div>
+      <button id="btn-close-drawer" class="glass-button w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div class="p-4 border-b border-white/10 space-y-3">
+      <div class="relative">
+        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        <input id="station-search" type="text" placeholder="Search track, artist, or vibe..." 
+               class="w-full pl-9 pr-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-mono placeholder-slate-500 focus:outline-none focus:border-cyan-400">
+      </div>
+      <!-- Filter Chips -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px] font-mono scrollbar-none" id="fx-filter-chips">
+        <button data-filter="all" class="filter-chip px-3 py-1 rounded-lg bg-cyan-400 text-slate-950 font-bold">ALL (<span id="filter-all-count">100</span>)</button>
+        <button data-filter="rain" class="filter-chip px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300">RAIN 🌧️</button>
+        <button data-filter="sakura" class="filter-chip px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300">SAKURA 🌸</button>
+        <button data-filter="stars" class="filter-chip px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300">STARS ✨</button>
+        <button data-filter="dust" class="filter-chip px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300">DUST 🍂</button>
+        <button data-filter="leaves" class="filter-chip px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300">LEAVES 🍁</button>
+        <button data-filter="clear" class="filter-chip px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300">CLEAR ☀️</button>
+      </div>
+    </div>
+
+    <!-- Station List (Scrollable) -->
+    <div id="station-list" class="flex-1 overflow-y-auto p-3 space-y-2">
+      <!-- Populated dynamically by JavaScript -->
+    </div>
+  </aside>
+
+  <!-- ========================================================================= -->
+  <!-- 5. PROCEDURAL AMBIENT SOUND MIXER MODAL (Web Audio API) -->
+  <!-- ========================================================================= -->
+  <div id="mixer-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md hidden">
+    <div class="glass-panel w-full max-w-md p-6 rounded-3xl border border-white/20 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
+        <div class="flex items-center gap-2">
+          <i data-lucide="sliders" class="w-5 h-5 text-emerald-400"></i>
+          <h3 class="font-mono font-bold text-white text-base">AMBIENT SOUND MIXER</h3>
+        </div>
+        <button id="btn-close-mixer" class="glass-button w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-400 mb-6 font-mono leading-relaxed">
+        Pure Web Audio API procedural synthesis. Real-time soundscapes layered over your lo-fi music. Automatically saved!
+      </p>
+
+      <div class="space-y-5 font-mono">
+        <!-- 1. Rain Storm Sound Generator -->
+        <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10">
+          <div class="flex items-center justify-between mb-2">
+            <span class="flex items-center gap-2 text-xs font-bold text-cyan-300">
+              <i data-lucide="cloud-rain" class="w-4 h-4"></i>
+              RAIN STORM
+            </span>
+            <span id="rain-vol-label" class="text-xs text-slate-400">0%</span>
+          </div>
+          <input id="slider-rain" type="range" min="0" max="1" step="0.01" value="0" class="w-full">
+        </div>
+
+        <!-- 2. Vinyl Crackle Sound Generator -->
+        <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10">
+          <div class="flex items-center justify-between mb-2">
+            <span class="flex items-center gap-2 text-xs font-bold text-amber-300">
+              <i data-lucide="disc" class="w-4 h-4"></i>
+              VINYL CRACKLE
+            </span>
+            <span id="vinyl-vol-label" class="text-xs text-slate-400">0%</span>
+          </div>
+          <input id="slider-vinyl" type="range" min="0" max="1" step="0.01" value="0" class="w-full">
+        </div>
+
+        <!-- 3. Cozy Wind Sound Generator -->
+        <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10">
+          <div class="flex items-center justify-between mb-2">
+            <span class="flex items-center gap-2 text-xs font-bold text-sky-300">
+              <i data-lucide="wind" class="w-4 h-4"></i>
+              COZY WIND
+            </span>
+            <span id="wind-vol-label" class="text-xs text-slate-400">0%</span>
+          </div>
+          <input id="slider-wind" type="range" min="0" max="1" step="0.01" value="0" class="w-full">
+        </div>
+      </div>
+
+      <!-- Quick Preset Actions -->
+      <div class="mt-6 flex items-center justify-between pt-4 border-t border-white/10">
+        <button id="btn-ambient-preset" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-mono text-cyan-300">
+          Cozy Night Preset
+        </button>
+        <button id="btn-ambient-mute" class="px-3 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-xs font-mono text-red-300">
+          Mute All Ambient
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 6. POMODORO FOCUS TIMER MODAL -->
+  <!-- ========================================================================= -->
+  <div id="pomo-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md hidden">
+    <div class="glass-panel w-full max-w-sm p-6 rounded-3xl border border-white/20 shadow-2xl text-center relative">
+      <button id="btn-close-pomo" class="glass-button w-8 h-8 rounded-xl absolute top-4 right-4 flex items-center justify-center text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="w-12 h-12 mx-auto mb-3 rounded-2xl bg-amber-500/20 text-amber-300 flex items-center justify-center">
+        <i data-lucide="timer" class="w-6 h-6"></i>
+      </div>
+      <h3 class="font-mono font-bold text-white text-lg mb-1">POMODORO TIMER</h3>
+      <p class="text-xs text-slate-400 font-mono mb-4">Stay in deep flow with gentle breaks</p>
+
+      <!-- Timer Mode Selector -->
+      <div class="flex items-center justify-center gap-1.5 mb-6 p-1 rounded-xl bg-white/5 border border-white/10 text-xs font-mono">
+        <button id="pomo-mode-work" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold">FOCUS (25m)</button>
+        <button id="pomo-mode-short" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">SHORT (5m)</button>
+        <button id="pomo-mode-long" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">LONG (15m)</button>
+      </div>
+
+      <!-- Giant Digital Display -->
+      <div id="pomo-display" class="text-6xl font-vt font-bold text-white tracking-widest my-4 text-shadow drop-shadow-lg">
+        25:00
+      </div>
+
+      <!-- Controls -->
+      <div class="flex items-center justify-center gap-3 mt-6">
+        <button id="pomo-start-btn" class="px-6 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-mono font-bold text-xs tracking-wider transition">
+          START TIMER
+        </button>
+        <button id="pomo-reset-btn" class="glass-button px-4 py-2.5 rounded-xl text-slate-300 font-mono text-xs hover:text-white">
+          RESET
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 7. CUSTOM STATION UPLOADER MODAL -->
+  <!-- ========================================================================= -->
+  <div id="upload-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md hidden">
+    <div class="glass-panel w-full max-w-md p-6 rounded-3xl border border-white/20 shadow-2xl relative font-mono">
+      <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
+        <div class="flex items-center gap-2">
+          <i data-lucide="upload" class="w-5 h-5 text-pink-400"></i>
+          <h3 class="font-bold text-white text-base">CUSTOM STATION UPLOADER</h3>
+        </div>
+        <button id="btn-close-upload" class="glass-button w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form id="custom-station-form" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">Track Title</label>
+          <input id="custom-title" type="text" required placeholder="e.g. My Midnight Mix"
+                 class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-pink-400">
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1">Artist Name</label>
+          <input id="custom-artist" type="text" required placeholder="e.g. Dreamer"
+                 class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-pink-400">
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1">Visual FX Atmosphere</label>
+          <select id="custom-fx" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white focus:outline-none focus:border-pink-400">
+            <option value="rain">Rain FX 🌧️</option>
+            <option value="sakura">Sakura Blossoms 🌸</option>
+            <option value="stars">Twinkling Stars ✨</option>
+            <option value="dust">Floating Dust Motes 🍂</option>
+            <option value="leaves">Autumn Leaves 🍁</option>
+            <option value="clear">Clear Ambient Orbs ☀️</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1">Audio File (.mp3, .wav, .m4a)</label>
+          <input id="custom-audio-file" type="file" accept="audio/*" required
+                 class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-pink-500/20 file:text-pink-300 hover:file:bg-pink-500/30">
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1">Background Image or GIF (Optional)</label>
+          <input id="custom-image-file" type="file" accept="image/*"
+                 class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-cyan-500/20 file:text-cyan-300 hover:file:bg-cyan-500/30">
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-400 hover:to-purple-400 text-white font-bold tracking-wider text-xs shadow-lg shadow-pink-500/20 transition">
+          ADD STATION & PLAY NOW
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 8. RETRO SCRATCHPAD / TO-DO NOTES WIDGET -->
+  <!-- ========================================================================= -->
+  <div id="notes-widget" class="fixed bottom-6 left-6 z-40 w-80 sm:w-88 glass-panel p-4 rounded-2xl border border-white/20 shadow-2xl transition-all duration-300 font-mono hidden">
+    <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
+      <div class="flex items-center gap-2">
+        <i data-lucide="file-text" class="w-4 h-4 text-cyan-400"></i>
+        <span class="text-xs font-bold text-white tracking-wider">NOTES & TO-DO</span>
+        <span id="notes-save-indicator" class="text-[9px] text-emerald-400 font-normal">● Saved</span>
+      </div>
+      <div class="flex items-center gap-1">
+        <button id="btn-clear-notes" title="Clear all" class="text-[10px] text-slate-400 hover:text-red-400 px-1.5 py-0.5 rounded transition">Clear</button>
+        <button id="btn-close-notes" class="glass-button w-6 h-6 rounded-lg flex items-center justify-center text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </div>
+    <!-- Mode tabs: Freeform vs Checklist -->
+    <div class="flex items-center gap-1 mb-2.5 p-0.5 rounded-lg bg-white/5 text-[11px]">
+      <button id="tab-notes-text" class="flex-1 py-1 rounded-md bg-cyan-400 text-slate-950 font-bold transition">Scratchpad</button>
+      <button id="tab-notes-todo" class="flex-1 py-1 rounded-md text-slate-400 hover:text-white transition">To-Do List</button>
+    </div>
+    <!-- Scratchpad Textarea -->
+    <div id="view-notes-text" class="w-full">
+      <textarea id="notes-textarea" rows="6" placeholder="Type quick notes, study goals, thoughts..." 
+                class="w-full p-2.5 rounded-xl bg-black/40 border border-white/10 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-400 resize-none font-mono"></textarea>
+    </div>
+    <!-- Checklist View -->
+    <div id="view-notes-todo" class="w-full hidden space-y-2">
+      <div class="flex items-center gap-1.5">
+        <input id="todo-input" type="text" placeholder="Add new task (press Enter)..." 
+               class="flex-1 px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/10 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-400">
+        <button id="btn-add-todo" class="px-2.5 py-1.5 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-slate-950 text-xs font-bold">+</button>
+      </div>
+      <div id="todo-list" class="max-h-40 overflow-y-auto space-y-1.5 pr-1">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 9. KEYBOARD SHORTCUTS MODAL -->
+  <!-- ========================================================================= -->
+  <div id="help-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md hidden">
+    <div class="glass-panel w-full max-w-sm p-6 rounded-3xl border border-white/20 shadow-2xl relative font-mono text-xs">
+      <button id="btn-close-help" class="glass-button w-8 h-8 rounded-xl absolute top-4 right-4 flex items-center justify-center text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <h3 class="font-bold text-white text-base mb-4 flex items-center gap-2">
+        <i data-lucide="keyboard" class="w-5 h-5 text-cyan-400"></i>
+        KEYBOARD SHORTCUTS
+      </h3>
+
+      <div class="space-y-2.5">
+        <div class="flex items-center justify-between p-2 rounded-lg bg-white/5">
+          <span class="text-slate-400">Play / Pause</span>
+          <kbd class="px-2 py-0.5 rounded bg-white/10 text-cyan-300 font-bold">Space</kbd>
+        </div>
+        <div class="flex items-center justify-between p-2 rounded-lg bg-white/5">
+          <span class="text-slate-400">Next / Prev Station</span>
+          <kbd class="px-2 py-0.5 rounded bg-white/10 text-cyan-300 font-bold">&larr; / &rarr;</kbd>
+        </div>
+        <div class="flex items-center justify-between p-2 rounded-lg bg-white/5">
+          <span class="text-slate-400">Volume Up / Down</span>
+          <kbd class="px-2 py-0.5 rounded bg-white/10 text-cyan-300 font-bold">&uarr; / &darr;</kbd>
+        </div>
+        <div class="flex items-center justify-between p-2 rounded-lg bg-white/5">
+          <span class="text-slate-400">Notes / Scratchpad</span>
+          <kbd class="px-2 py-0.5 rounded bg-white/10 text-cyan-300 font-bold">N</kbd>
+        </div>
+        <div class="flex items-center justify-between p-2 rounded-lg bg-white/5">
+          <span class="text-slate-400">Station Drawer</span>
+          <kbd class="px-2 py-0.5 rounded bg-white/10 text-cyan-300 font-bold">S or G</kbd>
+        </div>
+        <div class="flex items-center justify-between p-2 rounded-lg bg-white/5">
+          <span class="text-slate-400">Ambient Sound Mixer</span>
+          <kbd class="px-2 py-0.5 rounded bg-white/10 text-cyan-300 font-bold">A</kbd>
+        </div>
+        <div class="flex items-center justify-between p-2 rounded-lg bg-white/5">
+          <span class="text-slate-400">Pomodoro Timer</span>
+          <kbd class="px-2 py-0.5 rounded bg-white/10 text-cyan-300 font-bold">P</kbd>
+        </div>
+        <div class="flex items-center justify-between p-2 rounded-lg bg-white/5">
+          <span class="text-slate-400">CRT Retro Mode</span>
+          <kbd class="px-2 py-0.5 rounded bg-white/10 text-cyan-300 font-bold">C</kbd>
+        </div>
+        <div class="flex items-center justify-between p-2 rounded-lg bg-white/5">
+          <span class="text-slate-400">Mute Toggle</span>
+          <kbd class="px-2 py-0.5 rounded bg-white/10 text-cyan-300 font-bold">M</kbd>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Element (Stream Player) -->
+  <audio id="audio-stream" preload="auto" src="https://ice2.somafm.com/groovesalad-128-mp3"></audio>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT APPLICATION CORE -->
+  <!-- ========================================================================= -->
+  <script>
+    // Register PWA Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(e => console.log('SW registration skipped:', e));
+      });
+    }
+
+    // --- 1. STATIONS DATABASE ---
+    const stations = [
+  {
+    "id": 1,
+    "trackNum": "01",
+    "title": "Coffee & Rainy Windows",
+    "artist": "Komorebi Sound",
+    "vibe": "Rainy Cafe",
+    "fx": "rain",
+    "bg": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #101524 0%, #1e2638 50%, #0d111a 100%)",
+    "audio": "https://ice2.somafm.com/groovesalad-128-mp3"
+  },
+  {
+    "id": 2,
+    "trackNum": "02",
+    "title": "Midnight in Shibuya",
+    "artist": "Tokyo Tape 92",
+    "vibe": "Night Walk",
+    "fx": "rain",
+    "bg": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #0d0c1d 0%, #1f1a38 50%, #0b0914 100%)",
+    "audio": "https://ice2.somafm.com/dronezone-128-mp3"
+  },
+  {
+    "id": 3,
+    "trackNum": "03",
+    "title": "Rainy Night in Shinjuku",
+    "artist": "ChilledCow Memories",
+    "vibe": "Rainy Beats",
+    "fx": "rain",
+    "bg": "https://images.unsplash.com/photo-1514565131-fce0801e5785?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #111827 0%, #1f2937 50%, #030712 100%)",
+    "audio": "https://ice2.somafm.com/groovesalad2-128-mp3"
+  },
+  {
+    "id": 4,
+    "trackNum": "04",
+    "title": "Cyberpunk Ramen Bar",
+    "artist": "Neo Yakuza Vibes",
+    "vibe": "Cyberpunk Lofi",
+    "fx": "rain",
+    "bg": "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #23082e 0%, #3e1252 50%, #14041b 100%)",
+    "audio": "https://ice2.somafm.com/thetrip-128-mp3"
+  },
+  {
+    "id": 5,
+    "trackNum": "05",
+    "title": "Rain on the Skylight",
+    "artist": "Aethel Lo-Fi",
+    "vibe": "Deep Sleep",
+    "fx": "rain",
+    "bg": "https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #020617 100%)",
+    "audio": "https://ice2.somafm.com/deepspaceone-128-mp3"
+  },
+  {
+    "id": 6,
+    "trackNum": "06",
+    "title": "Cyber Dreams Under Rain",
+    "artist": "Nujabes Dreams",
+    "vibe": "Anime Lofi",
+    "fx": "rain",
+    "bg": "https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #18182b 0%, #2e284a 50%, #0d0d18 100%)",
+    "audio": "https://ice2.somafm.com/missioncontrol-128-mp3"
+  },
+  {
+    "id": 7,
+    "trackNum": "07",
+    "title": "Raindrops on Neon Signs",
+    "artist": "Yokohama Tape",
+    "vibe": "Citypop Chill",
+    "fx": "rain",
+    "bg": "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #1c102c 0%, #301b4c 50%, #0e0717 100%)",
+    "audio": "https://ice2.somafm.com/groovesalad-128-mp3"
+  },
+  {
+    "id": 8,
+    "trackNum": "08",
+    "title": "Rainstorm in Osaka Bay",
+    "artist": "Mellow Soul Lab",
+    "vibe": "Thunder Chill",
+    "fx": "rain",
+    "bg": "https://images.unsplash.com/photo-1498036882173-b41c28a8ba34?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #081226 0%, #12244a 50%, #040913 100%)",
+    "audio": "https://ice2.somafm.com/spacestation-128-mp3"
+  },
+  {
+    "id": 9,
+    "trackNum": "09",
+    "title": "Late Autumn Rain",
+    "artist": "Rainy Window Club",
+    "vibe": "Nostalgia",
+    "fx": "rain",
+    "bg": "https://images.unsplash.com/photo-1428592953211-077101b2021b?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #141b24 0%, #253342 50%, #0c1117 100%)",
+    "audio": "https://ice2.somafm.com/folkfwd-128-mp3"
+  },
+  {
+    "id": 10,
+    "trackNum": "10",
+    "title": "Tokyo Metro at 2 AM",
+    "artist": "Subway Serenade",
+    "vibe": "Midnight Lofi",
+    "fx": "rain",
+    "bg": "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #121820 0%, #222d3b 50%, #0a0d12 100%)",
+    "audio": "https://ice2.somafm.com/groovesalad-128-mp3"
+  },
+  {
+    "id": 11,
+    "trackNum": "11",
+    "title": "Sakura Blossom Terrace",
+    "artist": "Sora & Kumo",
+    "vibe": "Spring Chill",
+    "fx": "sakura",
+    "bg": "https://images.unsplash.com/photo-1490750967868-88aa4486c946?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #2b1b24 0%, #442838 50%, #1b1218 100%)",
+    "audio": "https://ice2.somafm.com/lush-128-mp3"
+  },
+  {
+    "id": 12,
+    "trackNum": "12",
+    "title": "Cherry Blossom River Walk",
+    "artist": "Pastel Morning",
+    "vibe": "Anime Romance",
+    "fx": "sakura",
+    "bg": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #331d2c 0%, #4f2a43 50%, #1e111a 100%)",
+    "audio": "https://ice2.somafm.com/indiepop-128-mp3"
+  },
+  {
+    "id": 13,
+    "trackNum": "13",
+    "title": "Sakura Petals at Dusk",
+    "artist": "Otaku Beats",
+    "vibe": "Sunset Lo-Fi",
+    "fx": "sakura",
+    "bg": "https://images.unsplash.com/photo-1522383225653-ed111181a951?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #361b2c 0%, #542844 50%, #20101a 100%)",
+    "audio": "https://ice2.somafm.com/groovesalad-128-mp3"
+  },
+  {
+    "id": 14,
+    "trackNum": "14",
+    "title": "Ghibli Meadow Picnic",
+    "artist": "Ghibli Lofi Project",
+    "vibe": "Peaceful Day",
+    "fx": "sakura",
+    "bg": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #1b2e23 0%, #294735 50%, #101c15 100%)",
+    "audio": "https://ice2.somafm.com/covers-128-mp3"
+  },
+  {
+    "id": 15,
+    "trackNum": "15",
+    "title": "Japanese Garden Pavilion",
+    "artist": "Green Zen Project",
+    "vibe": "Zen Focus",
+    "fx": "sakura",
+    "bg": "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #242220 0%, #3d3936 50%, #161514 100%)",
+    "audio": "https://ice2.somafm.com/groovesalad-128-mp3"
+  },
+  {
+    "id": 16,
+    "trackNum": "16",
+    "title": "Spring Schoolyard Nostalgia",
+    "artist": "Daisuki Records",
+    "vibe": "Aesthetic Youth",
+    "fx": "sakura",
+    "bg": "https://images.unsplash.com/photo-1490750967868-88aa4486c946?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #2e1d27 0%, #472d3c 50%, #1c1117 100%)",
+    "audio": "https://ice2.somafm.com/lush-128-mp3"
+  },
+  {
+    "id": 17,
+    "trackNum": "17",
+    "title": "Hanami Festival Lanterns",
+    "artist": "Tokyo Lo-Fi Boys",
+    "vibe": "Warm Evening",
+    "fx": "sakura",
+    "bg": "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #301a24 0%, #4a2837 50%, #1e1017 100%)",
+    "audio": "https://ice2.somafm.com/poptron-128-mp3"
+  },
+  {
+    "id": 18,
+    "trackNum": "18",
+    "title": "Whispering Spring Breeze",
+    "artist": "Komorebi Beats",
+    "vibe": "Soft Study",
+    "fx": "sakura",
+    "bg": "https://images.unsplash.com/photo-1518495973542-4542c06a5843?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #2d1c25 0%, #442a38 50%, #1b1117 100%)",
+    "audio": "https://ice2.somafm.com/folkfwd-128-mp3"
+  },
+  {
+    "id": 19,
+    "trackNum": "19",
+    "title": "Bicycle Ride Through Petals",
+    "artist": "Pastel Morning",
+    "vibe": "Sunny Breeze",
+    "fx": "sakura",
+    "bg": "https://images.unsplash.com/photo-1487621167305-5d248087c724?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #2f1e29 0%, #462d3e 50%, #1c1219 100%)",
+    "audio": "https://ice2.somafm.com/thistle-128-mp3"
+  },
+  {
+    "id": 20,
+    "trackNum": "20",
+    "title": "Pink Horizon Dream",
+    "artist": "Lo-Fi Radiance",
+    "vibe": "Dreamscape",
+    "fx": "sakura",
+    "bg": "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #311c2a 0%, #4d2b42 50%, #1e111a 100%)",
+    "audio": "https://ice2.somafm.com/groovesalad-128-mp3"
+  },
+  {
+    "id": 21,
+    "trackNum": "21",
+    "title": "Neon Highway 1984",
+    "artist": "RetroWave 88",
+    "vibe": "Synthwave",
+    "fx": "stars",
+    "bg": "https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #18052e 0%, #351052 50%, #0d0219 100%)",
+    "audio": "https://ice2.somafm.com/thetrip-128-mp3"
+  },
+  {
+    "id": 22,
+    "trackNum": "22",
+    "title": "Stargazing on the Balcony",
+    "artist": "Cosmic Drift",
+    "vibe": "Sleep & Dream",
+    "fx": "stars",
+    "bg": "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #091326 0%, #112244 50%, #050a14 100%)",
+    "audio": "https://ice2.somafm.com/spacestation-128-mp3"
+  },
+  {
+    "id": 23,
+    "trackNum": "23",
+    "title": "Celestial Observatory",
+    "artist": "Aesthetic Dreamer",
+    "vibe": "Ambient Chill",
+    "fx": "stars",
+    "bg": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #07101f 0%, #102140 50%, #040911 100%)",
+    "audio": "https://ice2.somafm.com/deepspaceone-128-mp3"
+  },
+  {
+    "id": 24,
+    "trackNum": "24",
+    "title": "Midnight Drive in Roppongi",
+    "artist": "Citypop Nostalgia",
+    "vibe": "Cruising",
+    "fx": "stars",
+    "bg": "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #120d24 0%, #231a47 50%, #0a0714 100%)",
+    "audio": "https://ice2.somafm.com/missioncontrol-128-mp3"
+  },
+  {
+    "id": 25,
+    "trackNum": "25",
+    "title": "Floating in Deep Space",
+    "artist": "Cosmic Drift",
+    "vibe": "Deep Focus",
+    "fx": "stars",
+    "bg": "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #060917 0%, #111833 50%, #03040b 100%)",
+    "audio": "https://ice2.somafm.com/dronezone-128-mp3"
+  },
+  {
+    "id": 26,
+    "trackNum": "26",
+    "title": "Neon Tokyo 2099",
+    "artist": "RetroWave 88",
+    "vibe": "Cyberpunk Lofi",
+    "fx": "stars",
+    "bg": "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #1c0a2a 0%, #381554 50%, #0f0517 100%)",
+    "audio": "https://ice2.somafm.com/groovesalad-128-mp3"
+  },
+  {
+    "id": 27,
+    "trackNum": "27",
+    "title": "Starlight Camping",
+    "artist": "Warm Blanket Beats",
+    "vibe": "Campfire",
+    "fx": "stars",
+    "bg": "https://images.unsplash.com/photo-1510312305653-8ed496efae75?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #091321 0%, #142842 50%, #050a12 100%)",
+    "audio": "https://ice2.somafm.com/bootliquor-128-mp3"
+  },
+  {
+    "id": 28,
+    "trackNum": "28",
+    "title": "Midnight Radiance",
+    "artist": "Lo-Fi Radiance",
+    "vibe": "Glowing Vibe",
+    "fx": "stars",
+    "bg": "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #0e1124 0%, #1e2447 50%, #070914 100%)",
+    "audio": "https://ice2.somafm.com/lush-128-mp3"
+  },
+  {
+    "id": 29,
+    "trackNum": "29",
+    "title": "Milky Way Railway",
+    "artist": "Sora & Kumo",
+    "vibe": "Dream Train",
+    "fx": "stars",
+    "bg": "https://images.unsplash.com/photo-1465101162946-4377e57745c3?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #0c1426 0%, #172647 50%, #060a14 100%)",
+    "audio": "https://ice2.somafm.com/spacestation-128-mp3"
+  },
+  {
+    "id": 30,
+    "trackNum": "30",
+    "title": "Cosmic Bedroom Chill",
+    "artist": "Aethel Lo-Fi",
+    "vibe": "Late Night",
+    "fx": "stars",
+    "bg": "https://images.unsplash.com/photo-1502134249126-9f3755a50d78?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #110e24 0%, #231c47 50%, #090714 100%)",
+    "audio": "https://ice2.somafm.com/groovesalad-128-mp3"
+  },
+  {
+    "id": 31,
+    "trackNum": "31",
+    "title": "Cozy Attic Bedroom",
+    "artist": "Warm Blanket Beats",
+    "vibe": "Study Session",
+    "fx": "dust",
+    "bg": "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #2b1d16 0%, #3e2b20 50%, #19100c 100%)",
+    "audio": "https://ice2.somafm.com/deepspaceone-128-mp3"
+  },
+  {
+    "id": 32,
+    "trackNum": "32",
+    "title": "Vintage Vinyl Record Shop",
+    "artist": "Cassette Rewind",
+    "vibe": "Analog Warmth",
+    "fx": "dust",
+    "bg": "https://images.unsplash.com/photo-1539185441755-769473a23570?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #291a13 0%, #422a1f 50%, #170e0a 100%)",
+    "audio": "https://ice2.somafm.com/folkfwd-128-mp3"
+  },
+  {
+    "id": 33,
+    "trackNum": "33",
+    "title": "Warm Fireplace & Old Books",
+    "artist": "Mellow Soul",
+    "vibe": "Reading Corner",
+    "fx": "dust",
+    "bg": "https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #2d180f 0%, #472618 50%, #1a0d08 100%)",
+    "audio": "https://ice2.somafm.com/spacestation-128-mp3"
+  },
+  {
+    "id": 34,
+    "trackNum": "34",
+    "title": "Cat Napping by the Window",
+    "artist": "Komorebi Sound",
+    "vibe": "Peaceful Afternoon",
+    "fx": "dust",
+    "bg": "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #281d18 0%, #3d2d25 50%, #16100d 100%)",
+    "audio": "https://ice2.somafm.com/groovesalad-128-mp3"
+  },
+  {
+    "id": 35,
+    "trackNum": "35",
+    "title": "Night Library Whispers",
+    "artist": "Deep Study Co.",
+    "vibe": "Silent Focus",
+    "fx": "dust",
+    "bg": "https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #1c1815 0%, #302a25 50%, #110e0c 100%)",
+    "audio": "https://ice2.somafm.com/fluid-128-mp3"
+  },
+  {
+    "id": 36,
+    "trackNum": "36",
+    "title": "Old Cassette Memories",
+    "artist": "Cassette Rewind",
+    "vibe": "Tape Hiss",
+    "fx": "dust",
+    "bg": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #261b17 0%, #3c2b25 50%, #160f0d 100%)",
+    "audio": "https://ice2.somafm.com/covers-128-mp3"
+  },
+  {
+    "id": 37,
+    "trackNum": "37",
+    "title": "Retro Arcade Corner",
+    "artist": "Tokyo Tape 92",
+    "vibe": "8-Bit Nostalgia",
+    "fx": "dust",
+    "bg": "https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #24142a 0%, #3c2045 50%, #150a18 100%)",
+    "audio": "https://ice2.somafm.com/secretagent-128-mp3"
+  },
+  {
+    "id": 38,
+    "trackNum": "38",
+    "title": "Kyoto Tea Garden",
+    "artist": "Green Zen Project",
+    "vibe": "Deep Focus",
+    "fx": "leaves",
+    "bg": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #14241c 0%, #203a2c 50%, #0d1712 100%)",
+    "audio": "https://ice2.somafm.com/sonicuniverse-128-mp3"
+  },
+  {
+    "id": 39,
+    "trackNum": "39",
+    "title": "Autumn Leaves in Kamakura",
+    "artist": "Maple Acoustic",
+    "vibe": "Mellow Autumn",
+    "fx": "leaves",
+    "bg": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #2e1a12 0%, #4a281a 50%, #1a0e09 100%)",
+    "audio": "https://ice2.somafm.com/illstreet-128-mp3"
+  },
+  {
+    "id": 40,
+    "trackNum": "40",
+    "title": "Whispering Bamboo Forest",
+    "artist": "Komorebi Beats",
+    "vibe": "Bamboo Zen",
+    "fx": "leaves",
+    "bg": "https://images.unsplash.com/photo-1509114397022-ed747cca3f65?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #122119 0%, #1d3629 50%, #0a130e 100%)",
+    "audio": "https://ice2.somafm.com/deepspaceone-128-mp3"
+  },
+  {
+    "id": 41,
+    "trackNum": "41",
+    "title": "Autumn Maple Shrine",
+    "artist": "Daisuki Records",
+    "vibe": "Shrine Walk",
+    "fx": "leaves",
+    "bg": "https://images.unsplash.com/photo-1473448912268-2022ce9509d8?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #33190f 0%, #4f2717 50%, #1e0e09 100%)",
+    "audio": "https://ice2.somafm.com/thistle-128-mp3"
+  },
+  {
+    "id": 42,
+    "trackNum": "42",
+    "title": "Peaceful Mountain Hermitage",
+    "artist": "Green Zen Project",
+    "vibe": "Mountain Air",
+    "fx": "leaves",
+    "bg": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #16241b 0%, #233b2c 50%, #0d1610 100%)",
+    "audio": "https://ice2.somafm.com/folkfwd-128-mp3"
+  },
+  {
+    "id": 43,
+    "trackNum": "43",
+    "title": "Golden Forest Trail",
+    "artist": "Maple Acoustic",
+    "vibe": "Golden Hour",
+    "fx": "leaves",
+    "bg": "https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #2b1b11 0%, #442a1b 50%, #190f0a 100%)",
+    "audio": "https://ice2.somafm.com/bootliquor-128-mp3"
+  },
+  {
+    "id": 44,
+    "trackNum": "44",
+    "title": "Cozy Lo-Fi Greenhouse",
+    "artist": "Komorebi Sound",
+    "vibe": "Botanical Vibe",
+    "fx": "leaves",
+    "bg": "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #13241b 0%, #1f3b2c 50%, #0b1510 100%)",
+    "audio": "https://ice2.somafm.com/synphaera-128-mp3"
+  },
+  {
+    "id": 45,
+    "trackNum": "45",
+    "title": "Sunset Train to Osaka",
+    "artist": "Tokyo Tape 92",
+    "vibe": "Golden Journey",
+    "fx": "clear",
+    "bg": "https://images.unsplash.com/photo-1494548162494-384bba4ab999?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #2e171b 0%, #47232a 50%, #1c0e11 100%)",
+    "audio": "https://ice2.somafm.com/secretagent-128-mp3"
+  },
+  {
+    "id": 46,
+    "trackNum": "46",
+    "title": "Late Night Code Session",
+    "artist": "Aethel Lo-Fi",
+    "vibe": "Deep Code",
+    "fx": "clear",
+    "bg": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #0d1527 0%, #182645 50%, #080c17 100%)",
+    "audio": "https://ice2.somafm.com/indiepop-128-mp3"
+  },
+  {
+    "id": 47,
+    "trackNum": "47",
+    "title": "Pixel Art Rooftop",
+    "artist": "Otaku Beats",
+    "vibe": "Retro Gaming",
+    "fx": "clear",
+    "bg": "https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #1b162b 0%, #2f274a 50%, #100d1a 100%)",
+    "audio": "https://ice2.somafm.com/poptron-128-mp3"
+  },
+  {
+    "id": 48,
+    "trackNum": "48",
+    "title": "Sunset Over Yokohama Pier",
+    "artist": "Yokohama Tape",
+    "vibe": "Harbor Breeze",
+    "fx": "clear",
+    "bg": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #2b181a 0%, #45262a 50%, #190e0f 100%)",
+    "audio": "https://ice2.somafm.com/dronezone-128-mp3"
+  },
+  {
+    "id": 49,
+    "trackNum": "49",
+    "title": "Floating Island in the Clouds",
+    "artist": "Sora & Kumo",
+    "vibe": "Sky Lounge",
+    "fx": "clear",
+    "bg": "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #142033 0%, #203352 50%, #0c131f 100%)",
+    "audio": "https://ice2.somafm.com/spacestation-128-mp3"
+  },
+  {
+    "id": 50,
+    "trackNum": "50",
+    "title": "Eternal Sunset Highway",
+    "artist": "RetroWave 88",
+    "vibe": "Outrun Dreams",
+    "fx": "clear",
+    "bg": "https://images.unsplash.com/photo-1509114397022-ed747cca3f65?q=80&w=1920&auto=format&fit=crop",
+    "grad": "linear-gradient(135deg, #2c1424 0%, #47203a 50%, #1a0c15 100%)",
+    "audio": "https://ice2.somafm.com/thetrip-128-mp3"
+  }
+];
+
+    const additionalStationThemes = [
+      { title: "Midnight Metro Drizzle", channel: "beatblender", vibe: "Deep-house after hours", fx: "rain", hue: 214 },
+      { title: "Lanterns over the Playa", channel: "brfm", vibe: "Desert-night eclectic", fx: "stars", hue: 26 },
+      { title: "Dusty Boots at Blue Hour", channel: "bootliquor", vibe: "Americana roots", fx: "dust", hue: 32 },
+      { title: "Moonlit Rio Cafe", channel: "bossa", vibe: "Bossa nova breeze", fx: "clear", hue: 190 },
+      { title: "The Quiet Campsite", channel: "chillits", vibe: "Outdoor chill", fx: "stars", hue: 156 },
+      { title: "Snow Globe Listening Room", channel: "christmas", vibe: "Holiday lounge", fx: "stars", hue: 192 },
+      { title: "Indie December Rooftop", channel: "xmasrocks", vibe: "Alternative holiday", fx: "rain", hue: 334 },
+      { title: "Pixel Rain Arcade", channel: "cliqhop", vibe: "Glitchy beat study", fx: "rain", hue: 278 },
+      { title: "Cover Versions in a Velvet Bar", channel: "covers", vibe: "Familiar songs, new voices", fx: "dust", hue: 24 },
+      { title: "The Dark Observatory", channel: "darkzone", vibe: "Deep dark ambient", fx: "stars", hue: 246 },
+      { title: "Blue Hours beyond Saturn", channel: "deepspaceone", vibe: "Deep space ambient", fx: "stars", hue: 222 },
+      { title: "Afterhours Terminal", channel: "defcon", vibe: "Electronic night drive", fx: "rain", hue: 204 },
+      { title: "Department Store at Midnight", channel: "deptstore", vibe: "Vintage holiday lounge", fx: "dust", hue: 38 },
+      { title: "Analog Dreams in Soft Focus", channel: "digitalis", vibe: "Warm analog textures", fx: "dust", hue: 46 },
+      { title: "October Shadow Theatre", channel: "doomed", vibe: "Dark cinematic ambient", fx: "stars", hue: 282 },
+      { title: "Stillness at the Lighthouse", channel: "dronezone", vibe: "Minimal atmospheric", fx: "rain", hue: 202 },
+      { title: "Cloud Study No. 2", channel: "dz2", vibe: "Textural ambient", fx: "stars", hue: 232 },
+      { title: "Bassline under the Overpass", channel: "dubstep", vibe: "Deep bass currents", fx: "rain", hue: 268 },
+      { title: "Liquid Neon Notebook", channel: "fluid", vibe: "Instrumental future soul", fx: "rain", hue: 174 },
+      { title: "Field Notes on the Hillside", channel: "folkfwd", vibe: "Indie folk", fx: "leaves", hue: 98 },
+      { title: "Greenhouse after Rain", channel: "groovesalad", vibe: "Chilled downtempo", fx: "rain", hue: 128 },
+      { title: "Another Room in the Greenhouse", channel: "groovesalad2", vibe: "Ambient beat garden", fx: "leaves", hue: 142 },
+      { title: "Cassette Garden", channel: "gsclassic", vibe: "Classic chillout", fx: "dust", hue: 118 },
+      { title: "Sunset Sound System", channel: "reggae", vibe: "Reggae and rocksteady", fx: "clear", hue: 44 },
+      { title: "Velvet Booth at 2 AM", channel: "illstreet", vibe: "Exotica lounge", fx: "stars", hue: 18 },
+      { title: "Daydreams in Technicolor", channel: "insound", vibe: "Psychedelic pop", fx: "sakura", hue: 316 },
+      { title: "Indie Postcards from Everywhere", channel: "indiepop", vibe: "Indie pop", fx: "clear", hue: 340 },
+      { title: "Soul on the Snowy Porch", channel: "jollysoul", vibe: "Vintage soul", fx: "leaves", hue: 8 },
+      { title: "Pacific Coast FM", channel: "seventies", vibe: "Mellow seventies", fx: "clear", hue: 34 },
+      { title: "Silk Lanterns", channel: "lush", vibe: "Mellow vocal electronica", fx: "sakura", hue: 326 },
+      { title: "Moonlit Road to Nowhere", channel: "metal", vibe: "Heavy midnight drive", fx: "stars", hue: 354 },
+      { title: "Control Room in Orbit", channel: "missioncontrol", vibe: "Space-age chill", fx: "stars", hue: 218 },
+      { title: "The Room between Raindrops", channel: "n5md", vibe: "Ambient experiments", fx: "rain", hue: 190 },
+      { title: "Chrome City Morning", channel: "poptron", vibe: "Bright electronic pop", fx: "clear", hue: 300 },
+      { title: "Secret Room No. 9", channel: "secretagent", vibe: "Mysterious soundtrack", fx: "stars", hue: 258 },
+      { title: "Seven-Inch Sunset", channel: "7soul", vibe: "Vintage soul grooves", fx: "clear", hue: 22 },
+      { title: "Fog beneath the Golden Gate", channel: "dronezone", vibe: "Ambient city haze", fx: "rain", hue: 200 },
+      { title: "Library in the Quiet Hours", channel: "n5md", vibe: "Ambient reading room", fx: "stars", hue: 242 },
+      { title: "The Day the Speakers Opened", channel: "live", vibe: "Live session recordings", fx: "dust", hue: 276 },
+      { title: "Sampler for the Night", channel: "specials", vibe: "Rotating special mixes", fx: "sakura", hue: 290 },
+      { title: "Midnight Blue Notes", channel: "sonicuniverse", vibe: "Eclectic late-night jazz", fx: "stars", hue: 212 },
+      { title: "Antenna through the Stars", channel: "spacestation", vibe: "Space ambient electronica", fx: "stars", hue: 232 },
+      { title: "Monsoon at the Outer Station", channel: "suburbsofgoa", vibe: "Asian world beats", fx: "rain", hue: 158 },
+      { title: "Soft Matter in Motion", channel: "synphaera", vibe: "Modern space ambient", fx: "dust", hue: 264 },
+      { title: "The Wind Knows the Old Road", channel: "thistle", vibe: "Celtic roots", fx: "leaves", hue: 108 },
+      { title: "Tiki Lanterns in the Rain", channel: "tikitime", vibe: "Vintage island rhythms", fx: "rain", hue: 28 },
+      { title: "Midnight on the Astral Express", channel: "thetrip", vibe: "Progressive night drive", fx: "stars", hue: 290 },
+      { title: "Neon Dial at 83 MHz", channel: "u80s", vibe: "Early synthpop", fx: "rain", hue: 312 },
+      { title: "Reflection in a Vaporwave Pool", channel: "vaporwaves", vibe: "Soft-focus vaporwave", fx: "sakura", hue: 328 },
+      { title: "Last Stop before Morning", channel: "xmasinfrisko", vibe: "Eclectic holiday mix", fx: "leaves", hue: 350 }
+    ];
+
+    const somaChannelNames = {
+      beatblender: "Beat Blender",
+      brfm: "Black Rock FM",
+      bootliquor: "Boot Liquor",
+      bossa: "Bossa Beyond",
+      chillits: "Chillits Radio",
+      christmas: "Christmas Lounge",
+      xmasrocks: "Christmas Rocks!",
+      cliqhop: "cliqhop IDM",
+      covers: "Covers",
+      darkzone: "The Dark Zone",
+      deepspaceone: "Deep Space One",
+      defcon: "DEF CON Radio",
+      deptstore: "Department Store Christmas",
+      digitalis: "Digitalis",
+      doomed: "Doomed",
+      dronezone: "Drone Zone",
+      dz2: "Drone Zone 2",
+      dubstep: "Dub Step Beyond",
+      fluid: "Fluid",
+      folkfwd: "Folk Forward",
+      groovesalad: "Groove Salad",
+      groovesalad2: "Groove Salad 2",
+      gsclassic: "Groove Salad Classic",
+      reggae: "Heavyweight Reggae",
+      illstreet: "Illinois Street Lounge",
+      insound: "The In-Sound",
+      indiepop: "Indie Pop Rocks!",
+      jollysoul: "Jolly Ol' Soul",
+      seventies: "Left Coast 70s",
+      lush: "Lush",
+      metal: "Metal Detector",
+      missioncontrol: "Mission Control",
+      n5md: "n5MD Radio",
+      poptron: "PopTron",
+      secretagent: "Secret Agent",
+      "7soul": "Seven Inch Soul",
+      sf1033: "SF 10-33",
+      sfinsf: "SF in SF",
+      live: "SomaFM Live",
+      specials: "SomaFM Specials",
+      sonicuniverse: "Sonic Universe",
+      spacestation: "Space Station Soma",
+      suburbsofgoa: "Suburbs of Goa",
+      synphaera: "Synphaera Radio",
+      thistle: "ThistleRadio",
+      tikitime: "Tiki Time",
+      thetrip: "The Trip",
+      u80s: "Underground 80s",
+      vaporwaves: "Vaporwaves",
+      xmasinfrisko: "Xmas in Frisko"
+    };
+
+    const additionalStationArtwork = [
+      "https://cdn.pixabay.com/photo/2020/11/24/10/37/tokyo-5772124_1280.jpg",
+      "https://cdn.pixabay.com/photo/2021/11/20/13/47/sky-6811874_1280.jpg",
+      "https://cdn.pixabay.com/photo/2016/01/02/22/29/cowboy-1118766_1280.jpg",
+      "https://cdn.pixabay.com/photo/2018/07/20/01/42/rio-de-janeiro-3549804_1280.jpg",
+      "https://cdn.pixabay.com/photo/2019/09/15/23/31/vacation-4479586_1280.jpg",
+      "https://cdn.pixabay.com/photo/2018/05/04/07/55/snow-3373432_1280.jpg",
+      "https://cdn.pixabay.com/photo/2016/01/23/12/56/otaru-1157371_1280.jpg",
+      "https://cdn.pixabay.com/photo/2021/04/12/16/11/arcade-6173139_1280.jpg",
+      "https://cdn.pixabay.com/photo/2014/10/22/17/50/bar-498420_1280.jpg",
+      "https://cdn.pixabay.com/photo/2020/04/21/15/34/sky-5073505_1280.jpg",
+      "https://cdn.pixabay.com/photo/2016/10/30/20/46/universe-1784292_1280.jpg",
+      "https://cdn.pixabay.com/photo/2019/11/10/10/04/airport-4615368_1280.jpg",
+      "https://cdn.pixabay.com/photo/2022/12/25/09/54/christmas-7677113_1280.jpg",
+      "https://cdn.pixabay.com/photo/2020/05/11/18/30/camera-5159666_1280.jpg",
+      "https://cdn.pixabay.com/photo/2023/10/31/18/18/forest-8355748_1280.jpg",
+      "https://cdn.pixabay.com/photo/2019/05/19/11/18/landscape-4213831_1280.jpg",
+      "https://cdn.pixabay.com/photo/2020/09/11/17/01/landscape-5563684_1280.jpg",
+      "https://cdn.pixabay.com/photo/2020/05/02/17/54/tunnel-5122424_1280.jpg",
+      "https://cdn.pixabay.com/photo/2020/05/06/00/15/cyberpunk-5135622_1280.jpg",
+      "https://cdn.pixabay.com/photo/2015/09/19/01/03/guitar-946701_1280.jpg",
+      "https://cdn.pixabay.com/photo/2019/04/28/02/16/conservatory-4161955_1280.jpg",
+      "https://cdn.pixabay.com/photo/2020/04/26/13/54/greenhouse-5095328_1280.jpg",
+      "https://cdn.pixabay.com/photo/2017/08/07/17/33/plant-2606042_1280.jpg",
+      "https://cdn.pixabay.com/photo/2012/11/10/14/12/copacabana-beach-65598_1280.jpg",
+      "https://cdn.pixabay.com/photo/2016/11/18/15/54/apartment-1835482_1280.jpg",
+      "https://cdn.pixabay.com/photo/2017/09/08/09/09/flowers-2728147_1280.jpg",
+      "https://cdn.pixabay.com/photo/2021/06/01/06/24/old-town-6300696_1280.jpg",
+      "https://cdn.pixabay.com/photo/2020/04/02/10/00/record-player-4994400_1280.jpg",
+      "https://cdn.pixabay.com/photo/2015/09/29/18/54/big-sur-964331_1280.jpg",
+      "https://cdn.pixabay.com/photo/2021/08/31/09/10/lotus-6588180_1280.jpg",
+      "https://cdn.pixabay.com/photo/2021/08/16/09/59/road-6549999_1280.jpg",
+      "https://cdn.pixabay.com/photo/2012/11/28/11/25/satellite-67718_1280.jpg",
+      "https://cdn.pixabay.com/photo/2016/03/27/16/40/window-1283073_1280.jpg",
+      "https://cdn.pixabay.com/photo/2024/03/23/08/13/tokyo-8650941_1280.jpg",
+      "https://cdn.pixabay.com/photo/2014/07/21/19/20/lobby-398845_1280.jpg",
+      "https://cdn.pixabay.com/photo/2016/11/23/00/58/record-player-1851576_1280.jpg",
+      "https://cdn.pixabay.com/photo/2013/11/23/01/06/golden-gate-bridge-216141_1280.jpg",
+      "https://cdn.pixabay.com/photo/2016/09/08/22/43/books-1655783_1280.jpg",
+      "https://cdn.pixabay.com/photo/2016/11/22/19/15/audience-1850119_1280.jpg",
+      "https://cdn.pixabay.com/photo/2020/04/02/23/01/rain-4996916_1280.jpg",
+      "https://cdn.pixabay.com/photo/2021/09/14/18/25/tenor-saxophone-6624725_1280.jpg",
+      "https://cdn.pixabay.com/photo/2015/10/29/23/50/esa-1013218_1280.jpg",
+      "https://cdn.pixabay.com/photo/2016/11/29/11/34/shinto-shrine-gates-1869216_1280.jpg",
+      "https://cdn.pixabay.com/photo/2017/06/22/19/55/ink-2432277_1280.jpg",
+      "https://cdn.pixabay.com/photo/2020/02/06/16/04/glencoe-4824774_1280.jpg",
+      "https://cdn.pixabay.com/photo/2024/08/16/22/38/tiki-bar-8974758_1280.jpg",
+      "https://cdn.pixabay.com/photo/2021/03/21/15/35/train-6112364_1280.jpg",
+      "https://cdn.pixabay.com/photo/2020/08/19/15/31/huangpu-river-5501210_1280.jpg",
+      "https://cdn.pixabay.com/photo/2017/06/26/20/36/palm-2445107_1280.jpg",
+      "https://cdn.pixabay.com/photo/2022/12/23/06/42/christmas-market-7673745_1280.jpg"
+    ];
+
+    stations.push(...additionalStationThemes.map((theme, index) => {
+        const id = stations.length + index + 1;
+      return {
+        id,
+        trackNum: String(id).padStart(2, "0"),
+        title: theme.title,
+        artist: `SomaFM • ${somaChannelNames[theme.channel]}`,
+        vibe: theme.vibe,
+        fx: theme.fx,
+        bg: additionalStationArtwork[index],
+        grad: "linear-gradient(135deg, #121827 0%, #23334a 50%, #080b12 100%)",
+        audio: `https://ice2.somafm.com/${theme.channel}-128-mp3`
+      };
+    }));
+
+    // --- State Variables ---
+    let currentStationIndex = 0;
+    let isPlaying = false;
+    let isSynthMode = false;
+    let weatherFxEnabled = true;
+    let crtEnabled = false;
+    let masterVolume = 0.75;
+    let isMuted = false;
+    let activeFilter = 'all';
+
+    // Pomodoro State
+    let pomoSecondsLeft = 25 * 60;
+    let pomoInterval = null;
+    let pomoMode = 'work'; // 'work', 'short', 'long'
+
+    // Idle Auto-Fade Timer (6 seconds)
+    let idleTimer = null;
+    const IDLE_TIMEOUT = 6000;
+
+    // --- Audio Context & Synthesis ---
+    let audioCtx = null;
+    let synthInterval = null;
+    const streamElement = document.getElementById('audio-stream');
+    let shouldPlayAudio = false;
+    let playbackRequestId = 0;
+    let streamRetryTimer = null;
+
+    function clearStreamRetry() {
+      if (streamRetryTimer !== null) {
+        clearTimeout(streamRetryTimer);
+        streamRetryTimer = null;
+      }
+    }
+
+    function scheduleStreamRetry(requestId, delay = 3000) {
+      if (streamRetryTimer !== null) return;
+
+      streamRetryTimer = setTimeout(() => {
+        streamRetryTimer = null;
+        if (requestId !== playbackRequestId || !shouldPlayAudio || isSynthMode) return;
+        try {
+          streamElement.load();
+          attemptStreamPlayback(requestId);
+        } catch (err) {
+          handleStreamPlaybackFailure(err, requestId);
+        }
+      }, delay);
+    }
+
+    function handleStreamPlaybackFailure(err, requestId) {
+      if (requestId !== playbackRequestId || !shouldPlayAudio || isSynthMode || err.name === 'AbortError') return;
+      console.warn('Stream playback failed; retrying:', err);
+      isPlaying = false;
+      updatePlayPauseUI(false);
+      const modeText = document.getElementById('source-mode-text');
+      if (modeText) modeText.textContent = 'RETRYING...';
+      scheduleStreamRetry(requestId);
+    }
+
+    function attemptStreamPlayback(requestId) {
+      if (requestId !== playbackRequestId || !shouldPlayAudio || isSynthMode) return;
+
+      try {
+        const playPromise = streamElement.play();
+        if (playPromise && typeof playPromise.then === 'function') {
+          playPromise.then(() => {
+            if (requestId !== playbackRequestId || !shouldPlayAudio || isSynthMode) return;
+            clearStreamRetry();
+            isPlaying = true;
+            updatePlayPauseUI(true);
+            const modeText = document.getElementById('source-mode-text');
+            if (modeText) modeText.textContent = 'RADIO STREAM';
+          }).catch(err => handleStreamPlaybackFailure(err, requestId));
+        } else if (requestId === playbackRequestId && shouldPlayAudio && !isSynthMode) {
+          clearStreamRetry();
+          isPlaying = true;
+          updatePlayPauseUI(true);
+        }
+      } catch (err) {
+        handleStreamPlaybackFailure(err, requestId);
+      }
+    }
+
+    if (streamElement) {
+      streamElement.addEventListener('playing', () => {
+        if (!isSynthMode && shouldPlayAudio) {
+          clearStreamRetry();
+          isPlaying = true;
+          updatePlayPauseUI(true);
+        }
+      });
+      streamElement.addEventListener('pause', () => {
+        if (!isSynthMode && !shouldPlayAudio && isPlaying) {
+          isPlaying = false;
+          updatePlayPauseUI(false);
+        }
+      });
+      ['waiting', 'stalled'].forEach(eventName => {
+        streamElement.addEventListener(eventName, () => {
+          if (!shouldPlayAudio || isSynthMode) return;
+          const modeText = document.getElementById('source-mode-text');
+          if (modeText) modeText.textContent = 'RECONNECTING...';
+          scheduleStreamRetry(playbackRequestId, 8000);
+        });
+      });
+      streamElement.addEventListener('error', (e) => {
+        if (shouldPlayAudio && !isSynthMode) {
+          handleStreamPlaybackFailure(e, playbackRequestId);
+        }
+      });
+    }
+
+    window.triggerAppStart = function() {
+      try {
+        if (typeof initializeApp === 'function' && !window._appInitialized) {
+          initializeApp();
+        }
+      } catch (err) {
+        console.warn('initializeApp error:', err);
+      }
+
+      try {
+        initAudioContext();
+      } catch (err) {
+        console.warn('initAudioContext error:', err);
+      }
+
+      try {
+        playAudio();
+      } catch (err) {
+        console.warn('playAudio error:', err);
+      }
+
+      if (typeof resetIdleTimer === 'function') resetIdleTimer();
+    };
+
+    if (window._pendingStart) {
+      window.triggerAppStart();
+    }
+
+    // Global Unlock and Start handler
+    let hasStarted = false;
+    window.unlockAndStart = function(e) {
+      if (hasStarted) return;
+      hasStarted = true;
+
+      // 1. Instantly hide start overlay
+      const overlay = document.getElementById('start-overlay');
+      if (overlay) {
+        overlay.style.transition = 'opacity 0.5s ease';
+        overlay.style.opacity = '0';
+        overlay.style.pointerEvents = 'none';
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        }, 550);
+      }
+
+      // 2. Ensure app initialization has run
+      try {
+        if (typeof initializeApp === 'function' && !window._appInitialized) {
+          initializeApp();
+        }
+      } catch (err) {
+        console.warn('initializeApp error:', err);
+      }
+
+      // 3. Initialize Audio
+      try {
+        initAudioContext();
+      } catch (err) {
+        console.warn('initAudioContext error:', err);
+      }
+
+      // 4. Start playback
+      try {
+        playAudio();
+      } catch (err) {
+        console.warn('playAudio error:', err);
+      }
+
+      if (typeof resetIdleTimer === 'function') resetIdleTimer();
+    };
+
+    window.addEventListener('keydown', function handleFirstKey(e) {
+      if (!hasStarted) {
+        unlockAndStart(e);
+        window.removeEventListener('keydown', handleFirstKey);
+      }
+    });
+
+
+    // Ambient Audio Generators (Rain, Vinyl, Wind)
+    let rainSource = null, rainGain = null;
+    let vinylSource = null, vinylGain = null;
+    let windSource = null, windGain = null;
+
+    // --- LocalStorage Persistence Engine ---
+    function savePreferences() {
+      try {
+        const prefs = {
+          stationIndex: currentStationIndex,
+          volume: masterVolume,
+          isMuted: isMuted,
+          weatherFxEnabled: weatherFxEnabled,
+          crtEnabled: crtEnabled,
+          isSynthMode: isSynthMode,
+          rainVol: parseFloat(document.getElementById('slider-rain').value) || 0,
+          vinylVol: parseFloat(document.getElementById('slider-vinyl').value) || 0,
+          windVol: parseFloat(document.getElementById('slider-wind').value) || 0
+        };
+        localStorage.setItem('lofi_cafe_prefs', JSON.stringify(prefs));
+      } catch (e) {
+        console.warn('LocalStorage save error:', e);
+      }
+    }
+
+    function loadPreferences() {
+      try {
+        const saved = localStorage.getItem('lofi_cafe_prefs');
+        if (saved) {
+          const prefs = JSON.parse(saved);
+          if (typeof prefs.stationIndex === 'number' && prefs.stationIndex < stations.length) {
+            currentStationIndex = prefs.stationIndex;
+          }
+          if (typeof prefs.volume === 'number') {
+            masterVolume = prefs.volume;
+            document.getElementById('volume-slider').value = masterVolume;
+            document.getElementById('volume-pct').textContent = `${Math.round(masterVolume * 100)}%`;
+          }
+          if (prefs.weatherFxEnabled !== undefined) {
+            weatherFxEnabled = prefs.weatherFxEnabled;
+            document.getElementById('fx-status-text').textContent = weatherFxEnabled ? 'ON' : 'OFF';
+          }
+          if (prefs.crtEnabled) {
+            crtEnabled = true;
+            document.getElementById('crt-layer').classList.remove('hidden');
+            document.getElementById('crt-status-text').textContent = 'ON';
+          }
+          if (prefs.isSynthMode) {
+            isSynthMode = true;
+            document.getElementById('source-mode-text').textContent = "SYNTH LO-FI";
+          }
+          // Restore ambient mixer sliders
+          if (typeof prefs.rainVol === 'number') {
+            document.getElementById('slider-rain').value = prefs.rainVol;
+            document.getElementById('rain-vol-label').textContent = `${Math.round(prefs.rainVol * 100)}%`;
+          }
+          if (typeof prefs.vinylVol === 'number') {
+            document.getElementById('slider-vinyl').value = prefs.vinylVol;
+            document.getElementById('vinyl-vol-label').textContent = `${Math.round(prefs.vinylVol * 100)}%`;
+          }
+          if (typeof prefs.windVol === 'number') {
+            document.getElementById('slider-wind').value = prefs.windVol;
+            document.getElementById('wind-vol-label').textContent = `${Math.round(prefs.windVol * 100)}%`;
+          }
+        }
+      } catch (e) {
+        console.warn('LocalStorage load error:', e);
+      }
+    }
+
+    let ambientInitialized = false;
+    let synthMasterGain = null;
+    function initAudioContext() {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (!synthMasterGain && audioCtx) {
+          synthMasterGain = audioCtx.createGain();
+          synthMasterGain.connect(audioCtx.destination);
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(e => console.warn('resume error:', e));
+        }
+        if (audioCtx && !ambientInitialized) {
+          initAmbientGenerators();
+          ambientInitialized = true;
+        }
+      } catch (err) {
+        console.warn('AudioContext init error:', err);
+      }
+    }
+
+    // --- Procedural Ambient Sound Mixer (Web Audio API) ---
+    function initAmbientGenerators() {
+      if (!audioCtx) return;
+
+      // 1. Rain Generator (Filtered Noise + Low Rumble)
+      const bufferSize = audioCtx.sampleRate * 4;
+      const rainBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const rainData = rainBuffer.getChannelData(0);
+      let lastOut = 0.0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        lastOut = (lastOut + (0.02 * white)) / 1.02; // Pink-ish filter
+        rainData[i] = lastOut * 3.5;
+      }
+      rainSource = audioCtx.createBufferSource();
+      rainSource.buffer = rainBuffer;
+      rainSource.loop = true;
+
+      const rainFilter = audioCtx.createBiquadFilter();
+      rainFilter.type = 'lowpass';
+      rainFilter.frequency.value = 850;
+
+      rainGain = audioCtx.createGain();
+      const initialRain = parseFloat(document.getElementById('slider-rain').value) || 0;
+      rainGain.gain.value = initialRain * 0.8;
+
+      rainSource.connect(rainFilter);
+      rainFilter.connect(rainGain);
+      rainGain.connect(audioCtx.destination);
+      rainSource.start(0);
+
+      // 2. Vinyl Crackle Generator (High-pass Noise + Sparse Delta Spikes)
+      const vinylBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const vinylData = vinylBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        let pop = 0;
+        if (Math.random() < 0.0006) {
+          pop = (Math.random() * 2 - 1) * 0.9;
+        }
+        const hiss = (Math.random() * 2 - 1) * 0.015;
+        vinylData[i] = pop + hiss;
+      }
+      vinylSource = audioCtx.createBufferSource();
+      vinylSource.buffer = vinylBuffer;
+      vinylSource.loop = true;
+
+      const vinylFilter = audioCtx.createBiquadFilter();
+      vinylFilter.type = 'highpass';
+      vinylFilter.frequency.value = 1200;
+
+      vinylGain = audioCtx.createGain();
+      const initialVinyl = parseFloat(document.getElementById('slider-vinyl').value) || 0;
+      vinylGain.gain.value = initialVinyl * 0.5;
+
+      vinylSource.connect(vinylFilter);
+      vinylFilter.connect(vinylGain);
+      vinylGain.connect(audioCtx.destination);
+      vinylSource.start(0);
+
+      // 3. Cozy Wind Generator (Bandpass Noise + LFO Sweep)
+      const windBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const windData = windBuffer.getChannelData(0);
+      let b0 = 0, b1 = 0, b2 = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99 * b0 + white * 0.05;
+        b1 = 0.95 * b1 + white * 0.08;
+        b2 = 0.85 * b2 + white * 0.12;
+        windData[i] = (b0 + b1 + b2) * 0.6;
+      }
+      windSource = audioCtx.createBufferSource();
+      windSource.buffer = windBuffer;
+      windSource.loop = true;
+
+      const windFilter = audioCtx.createBiquadFilter();
+      windFilter.type = 'bandpass';
+      windFilter.frequency.value = 350;
+      windFilter.Q.value = 2.2;
+
+      // LFO for gentle wind swell
+      const lfo = audioCtx.createOscillator();
+      lfo.frequency.value = 0.15;
+      const lfoGain = audioCtx.createGain();
+      lfoGain.gain.value = 200;
+      lfo.connect(lfoGain);
+      lfoGain.connect(windFilter.frequency);
+      lfo.start(0);
+
+      windGain = audioCtx.createGain();
+      const initialWind = parseFloat(document.getElementById('slider-wind').value) || 0;
+      windGain.gain.value = initialWind * 0.7;
+
+      windSource.connect(windFilter);
+      windFilter.connect(windGain);
+      windGain.connect(audioCtx.destination);
+      windSource.start(0);
+    }
+
+    // --- Procedural Lo-Fi Electric Piano Synthesizer (Fallback/Synth Mode) ---
+    const lofiProgressions = [
+      // Dm9 -> G13 -> Cmaj9 -> Am9
+      [ [146.83, 174.61, 220.0, 261.63, 329.63], [98.0, 174.61, 246.94, 329.63], [130.81, 164.81, 196.0, 246.94, 293.66], [110.0, 164.81, 196.0, 261.63, 329.63] ],
+      // Fmaj7 -> Em7 -> Dm9 -> Cmaj7
+      [ [174.61, 220.0, 261.63, 329.63], [164.81, 196.0, 246.94, 293.66], [146.83, 174.61, 220.0, 261.63, 329.63], [130.81, 164.81, 196.0, 246.94] ],
+      // Ebmaj7 -> Dm7 -> Cm7 -> Bbmaj7
+      [ [155.56, 196.0, 233.08, 293.66], [146.83, 174.61, 220.0, 261.63], [130.81, 155.56, 196.0, 233.08], [116.54, 146.83, 174.61, 220.0] ]
+    ];
+    let progIndex = 0;
+    let stepIndex = 0;
+
+    function playLoFiChord() {
+      if (!audioCtx || !isPlaying) return;
+      const prog = lofiProgressions[progIndex % lofiProgressions.length];
+      const chord = prog[stepIndex % prog.length];
+      stepIndex++;
+      if (stepIndex % 8 === 0) progIndex++;
+
+      const now = audioCtx.currentTime;
+      const chordGain = audioCtx.createGain();
+      chordGain.gain.setValueAtTime(0, now);
+      chordGain.gain.linearRampToValueAtTime((isMuted ? 0 : masterVolume) * 0.18, now + 0.05);
+      chordGain.gain.exponentialRampToValueAtTime(0.0001, now + 3.2);
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(800, now);
+      filter.Q.value = 1.8;
+
+      chord.forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        osc.type = (idx === 0) ? 'sine' : 'triangle';
+        const detune = (Math.random() - 0.5) * 8;
+        osc.frequency.setValueAtTime(freq, now);
+        osc.detune.setValueAtTime(detune, now);
+        osc.connect(filter);
+        osc.start(now);
+        osc.stop(now + 3.3);
+      });
+
+      filter.connect(chordGain);
+      chordGain.connect(synthMasterGain || audioCtx.destination);
+    }
+
+    function startSynthLoop() {
+      if (synthInterval) clearInterval(synthInterval);
+      playLoFiChord();
+      synthInterval = setInterval(() => {
+        if (isPlaying && (isSynthMode || streamElement.paused || streamElement.error)) {
+          playLoFiChord();
+        }
+      }, 3200);
+    }
+
+    function stopSynthLoop() {
+      if (synthInterval) clearInterval(synthInterval);
+      synthInterval = null;
+    }
+
+    // Synthesized Zen Pomodoro Bell Chime
+    function playZenBell() {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      [528, 1056].forEach(freq => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 3.5);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 3.6);
+      });
+    }
+
+    // --- Station Navigation & Playback ---
+    window.loadStation = function(index, autoPlay = true) {
+      if (index < 0) index = stations.length - 1;
+      if (index >= stations.length) index = 0;
+      currentStationIndex = index;
+      const st = stations[index];
+
+      // Update background with smooth fade — keep proper cover sizing, no zoom
+      const bg = document.getElementById('bg-container');
+      if (bg) {
+        bg.style.backgroundImage = `url('${st.bg}')`;
+        bg.style.backgroundSize = 'cover';
+        bg.style.backgroundPosition = 'center center';
+        bg.style.backgroundRepeat = 'no-repeat';
+        bg.style.filter = 'brightness(0.65)';
+        bg.style.animationDuration = `${28 + (index % 8) * 2}s`;
+      }
+
+      // Update Player Card Text
+      const trackBadge = document.getElementById('player-track-badge');
+      if (trackBadge) trackBadge.textContent = `TRACK ${st.trackNum} OF ${stations.length}`;
+      
+      const pTitle = document.getElementById('player-title');
+      if (pTitle) pTitle.textContent = st.title;
+
+      const pArtist = document.getElementById('player-artist-name');
+      if (pArtist) pArtist.textContent = st.artist;
+
+      const pVibe = document.getElementById('player-vibe');
+      if (pVibe) pVibe.textContent = st.vibe;
+
+      const pFx = document.getElementById('player-fx-name');
+      if (pFx) pFx.textContent = `${st.fx.toUpperCase()} FX`;
+
+      const vinylArt = document.getElementById('vinyl-artwork');
+      if (vinylArt) vinylArt.src = st.bg;
+
+      // Update Header Badge
+      const hTrackNum = document.getElementById('header-track-num');
+      if (hTrackNum) hTrackNum.textContent = `TRACK #${st.trackNum} / ${stations.length}`;
+
+      const hTrackTitle = document.getElementById('header-track-title');
+      if (hTrackTitle) hTrackTitle.textContent = st.title;
+
+      // Update active state in Station Drawer
+      if (typeof updateDrawerActiveItem === 'function') updateDrawerActiveItem();
+
+      // Re-initialize particles to match new station atmosphere!
+      if (typeof initParticles === 'function') initParticles();
+
+      // Configure Audio Stream — reset synth fallback so each station tries its real stream
+      shouldPlayAudio = false;
+      playbackRequestId++;
+      clearStreamRetry();
+      isPlaying = false;
+      if (streamElement) {
+        // Stop any currently playing stream cleanly
+        try { streamElement.pause(); } catch(e) {}
+        // Reset synth mode so this station tries its own radio stream fresh
+        if (isSynthMode) {
+          isSynthMode = false;
+          stopSynthLoop();
+          const modeText = document.getElementById('source-mode-text');
+          if (modeText) modeText.textContent = "RADIO STREAM";
+        }
+        // Set the new station's stream URL with a cache-bust to force a fresh connection
+        const streamUrl = st.audio + (st.audio.includes('?') ? '&' : '?') + '_t=' + Date.now();
+        streamElement.setAttribute('src', streamUrl);
+        streamElement.src = streamUrl;
+        streamElement.volume = isMuted ? 0 : masterVolume;
+        try { streamElement.load(); } catch(e) {}
+      }
+
+      savePreferences();
+
+      if (autoPlay) {
+        playAudio();
+      } else {
+        isPlaying = false;
+        updatePlayPauseUI(false);
+      }
+    };
+
+    function playAudio() {
+      initAudioContext();
+      shouldPlayAudio = true;
+      const requestId = ++playbackRequestId;
+      clearStreamRetry();
+
+      // Always try real radio stream (synth only used if manually toggled via Audio Mode button)
+      if (!isSynthMode) {
+        const currentUrl = stations[currentStationIndex].audio;
+        // Ensure src is set
+        if (!streamElement.src || streamElement.src === window.location.href || !streamElement.src.includes('://')) {
+          streamElement.src = currentUrl;
+          try { streamElement.load(); } catch(e) {}
+        }
+        isPlaying = false;
+        updatePlayPauseUI(false);
+        const modeText = document.getElementById('source-mode-text');
+        if (modeText) modeText.textContent = 'BUFFERING...';
+        attemptStreamPlayback(requestId);
+      } else {
+        // Manual synth mode (user explicitly toggled it)
+        try { streamElement.pause(); } catch(e) {}
+        startSynthLoop();
+        isPlaying = true;
+        updatePlayPauseUI(true);
+      }
+    }
+
+    function pauseAudio() {
+      shouldPlayAudio = false;
+      playbackRequestId++;
+      clearStreamRetry();
+      isPlaying = false;
+      if (streamElement) {
+        try { streamElement.pause(); } catch(e) {}
+      }
+      stopSynthLoop();
+      if (synthMasterGain && audioCtx) {
+        synthMasterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+      }
+      updatePlayPauseUI(false);
+    }
+
+    window.togglePlayPause = function() {
+      if (isPlaying) {
+        pauseAudio();
+      } else {
+        playAudio();
+      }
+    };
+
+    function updatePlayPauseUI(playing) {
+      const label = document.getElementById('play-pause-label');
+      const iconContainer = document.getElementById('play-pause-icon-container');
+      const vinylDisc = document.getElementById('vinyl-disc');
+      const headerBars = document.getElementById('header-bars');
+      const playerCard = document.getElementById('player-card');
+
+      if (playing) {
+        if (playerCard) playerCard.classList.add('is-playing');
+        if (label) label.textContent = "PAUSE";
+        if (iconContainer) {
+          iconContainer.innerHTML = `
+            <svg class="w-5 h-5 fill-current text-slate-950" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+              <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+            </svg>
+          `;
+        }
+        if (vinylDisc) vinylDisc.style.animationPlayState = 'running';
+        if (headerBars) headerBars.classList.remove('opacity-30');
+      } else {
+        if (playerCard) playerCard.classList.remove('is-playing');
+        if (label) label.textContent = "RESUME";
+        if (iconContainer) {
+          iconContainer.innerHTML = `
+            <svg class="w-5 h-5 fill-current text-slate-950" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="6 4 20 12 6 20 6 4"></polygon>
+            </svg>
+          `;
+        }
+        if (vinylDisc) vinylDisc.style.animationPlayState = 'paused';
+        if (headerBars) headerBars.classList.add('opacity-30');
+      }
+    }
+
+    window.setMasterVolume = function(val) {
+      masterVolume = Math.max(0, Math.min(1, parseFloat(val)));
+      isMuted = (masterVolume === 0);
+
+      if (streamElement) {
+        streamElement.volume = isMuted ? 0 : masterVolume;
+      }
+      if (synthMasterGain && audioCtx) {
+        synthMasterGain.gain.setValueAtTime((isMuted ? 0 : masterVolume), audioCtx.currentTime);
+      }
+
+      const pctLabel = document.getElementById('volume-pct');
+      if (pctLabel) pctLabel.textContent = `${Math.round(masterVolume * 100)}%`;
+
+      const slider = document.getElementById('volume-slider');
+      if (slider && Math.abs(parseFloat(slider.value) - masterVolume) > 0.01) {
+        slider.value = masterVolume;
+      }
+
+      updateMuteIcon();
+      savePreferences();
+    };
+
+    window.toggleMute = function() {
+      isMuted = !isMuted;
+      if (streamElement) {
+        streamElement.volume = isMuted ? 0 : masterVolume;
+      }
+      if (synthMasterGain && audioCtx) {
+        synthMasterGain.gain.setValueAtTime((isMuted ? 0 : masterVolume), audioCtx.currentTime);
+      }
+
+      const pctLabel = document.getElementById('volume-pct');
+      if (pctLabel) {
+        pctLabel.textContent = isMuted ? '0%' : `${Math.round(masterVolume * 100)}%`;
+      }
+
+      updateMuteIcon();
+      savePreferences();
+    };
+
+    function updateMuteIcon() {
+      const container = document.getElementById('mute-icon-container');
+      if (!container) return;
+      if (isMuted || masterVolume === 0) {
+        container.innerHTML = `
+          <svg class="w-4 h-4 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+        `;
+      } else if (masterVolume < 0.4) {
+        container.innerHTML = `
+          <svg class="w-4 h-4 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        `;
+      } else {
+        container.innerHTML = `
+          <svg class="w-4 h-4 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+          </svg>
+        `;
+      }
+    }
+
+    window.nextStation = function() {
+      window.loadStation(currentStationIndex + 1, isPlaying);
+    };
+
+    window.prevStation = function() {
+      window.loadStation(currentStationIndex - 1, isPlaying);
+    };
+
+    window.shuffleStation = function() {
+      let nextIdx;
+      do {
+        nextIdx = Math.floor(Math.random() * stations.length);
+      } while (nextIdx === currentStationIndex && stations.length > 1);
+      window.loadStation(nextIdx, isPlaying);
+    };
+
+    window.toggleAudioMode = function() {
+      isSynthMode = !isSynthMode;
+      const modeText = document.getElementById('source-mode-text');
+      const modeDot = document.getElementById('source-mode-dot');
+      
+      if (isSynthMode) {
+        if (modeText) modeText.textContent = "SYNTH LO-FI";
+        if (modeDot) modeDot.className = "w-2 h-2 rounded-full bg-cyan-400 animate-pulse";
+        if (streamElement) {
+          try { streamElement.pause(); } catch(e) {}
+        }
+        if (isPlaying) {
+          startSynthLoop();
+        }
+      } else {
+        if (modeText) modeText.textContent = "RADIO STREAM";
+        if (modeDot) modeDot.className = "w-2 h-2 rounded-full bg-emerald-400";
+        stopSynthLoop();
+        if (isPlaying) {
+          playAudio();
+        }
+      }
+      savePreferences();
+    };
+
+    function updateStationCounts() {
+      const count = String(stations.length);
+      const headerCount = document.getElementById('header-station-count');
+      const drawerCount = document.getElementById('drawer-station-count');
+      const filterCount = document.getElementById('filter-all-count');
+      if (headerCount) headerCount.textContent = count;
+      if (drawerCount) drawerCount.textContent = `${count} TRACKS`;
+      if (filterCount) filterCount.textContent = count;
+    }
+
+    // --- Station Library Drawer Rendering ---
+    function renderStationList() {
+      const container = document.getElementById('station-list');
+      container.innerHTML = '';
+      updateStationCounts();
+
+      const query = document.getElementById('station-search').value.toLowerCase().trim();
+
+      stations.forEach((st, idx) => {
+        if (activeFilter !== 'all' && st.fx !== activeFilter) return;
+        if (query && !st.title.toLowerCase().includes(query) && !st.artist.toLowerCase().includes(query) && !st.vibe.toLowerCase().includes(query)) return;
+
+        const isActive = idx === currentStationIndex;
+        const item = document.createElement('div');
+        item.className = `station-item p-3 rounded-2xl flex items-center justify-between gap-3 cursor-pointer transition border ${
+          isActive ? 'bg-cyan-500/20 border-cyan-400 text-white shadow-lg shadow-cyan-500/10' : 'bg-white/5 border-white/5 text-slate-300 hover:bg-white/10 hover:border-white/15'
+        }`;
+        item.setAttribute('data-index', idx);
+
+        item.innerHTML = `
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="font-mono text-xs font-bold ${isActive ? 'text-cyan-300' : 'text-slate-500'} w-6">
+              ${st.trackNum}
+            </span>
+            <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-900 border border-white/10 flex-shrink-0">
+              <img src="${st.bg}" class="w-full h-full object-cover" alt="${st.title}">
+            </div>
+            <div class="min-w-0">
+              <div class="font-bold text-xs truncate ${isActive ? 'text-cyan-200' : 'text-white'}">${st.title}</div>
+              <div class="text-[11px] text-slate-400 truncate">${st.artist} • <span class="text-slate-500">${st.vibe}</span></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-slate-400 uppercase">${st.fx}</span>
+            ${isActive ? '<span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>' : ''}
+          </div>
+        `;
+
+        item.addEventListener('click', () => {
+          loadStation(idx);
+          if (window.innerWidth < 640) toggleDrawer(false);
+        });
+
+        container.appendChild(item);
+      });
+    }
+
+    function updateDrawerActiveItem() {
+      const items = document.querySelectorAll('.station-item');
+      items.forEach(el => {
+        const idx = parseInt(el.getAttribute('data-index'));
+        if (idx === currentStationIndex) {
+          el.className = 'station-item p-3 rounded-2xl flex items-center justify-between gap-3 cursor-pointer transition border bg-cyan-500/20 border-cyan-400 text-white shadow-lg shadow-cyan-500/10';
+        } else {
+          el.className = 'station-item p-3 rounded-2xl flex items-center justify-between gap-3 cursor-pointer transition border bg-white/5 border-white/5 text-slate-300 hover:bg-white/10 hover:border-white/15';
+        }
+      });
+    }
+
+    function toggleDrawer(open) {
+      const drawer = document.getElementById('station-drawer');
+      const isOpen = !drawer.classList.contains('translate-x-full');
+      const shouldOpen = open !== undefined ? open : !isOpen;
+
+      if (shouldOpen) {
+        drawer.classList.remove('translate-x-full');
+        renderStationList();
+      } else {
+        drawer.classList.add('translate-x-full');
+      }
+    }
+
+    // --- Dynamic Canvas Particle System ---
+    const canvas = document.getElementById('fx-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let ripples = [];
+    let shootingStars = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      initParticles();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    function initParticles() {
+      particles = [];
+      ripples = [];
+      shootingStars = [];
+      const currentFx = stations[currentStationIndex].fx;
+      const count = currentFx === 'rain' ? 140 :
+                    currentFx === 'sakura' ? 45 :
+                    currentFx === 'stars' ? 90 :
+                    currentFx === 'dust' ? 60 :
+                    currentFx === 'leaves' ? 35 : 25;
+
+      for (let i = 0; i < count; i++) {
+        particles.push(createParticle(currentFx));
+      }
+    }
+
+    function createParticle(fx) {
+      return {
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 3 + 1,
+        speedX: (Math.random() - 0.5) * 1.5,
+        speedY: Math.random() * 2 + 1,
+        angle: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.05,
+        opacity: Math.random() * 0.7 + 0.3,
+        type: fx
+      };
+    }
+
+    function renderParticles() {
+      if (!weatherFxEnabled) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        requestAnimationFrame(renderParticles);
+        return;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const currentFx = stations[currentStationIndex].fx;
+
+      // 1. Rain FX
+      if (currentFx === 'rain') {
+        ctx.strokeStyle = 'rgba(180, 215, 255, 0.5)';
+        ctx.lineWidth = 1.2;
+        particles.forEach(p => {
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p.x - 2, p.y + 14);
+          ctx.stroke();
+
+          p.y += 16;
+          p.x -= 2;
+
+          if (p.y > canvas.height) {
+            p.y = -10;
+            p.x = Math.random() * canvas.width;
+            if (Math.random() < 0.25) {
+              ripples.push({ x: p.x, y: canvas.height - Math.random() * 20, r: 1, maxR: 12, alpha: 0.6 });
+            }
+          }
+        });
+
+        // Ripples on ground
+        ripples.forEach((r, idx) => {
+          ctx.strokeStyle = `rgba(180, 215, 255, ${r.alpha})`;
+          ctx.beginPath();
+          ctx.ellipse(r.x, r.y, r.r, r.r * 0.35, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          r.r += 0.6;
+          r.alpha -= 0.025;
+          if (r.alpha <= 0) ripples.splice(idx, 1);
+        });
+      }
+
+      // 2. Sakura Petals FX
+      else if (currentFx === 'sakura') {
+        particles.forEach(p => {
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.angle);
+          ctx.scale(Math.cos(p.angle * 1.5), 1);
+
+          ctx.fillStyle = `rgba(255, 183, 197, ${p.opacity})`;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, p.size * 3.5, p.size * 2, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+
+          p.y += p.speedY * 0.8;
+          p.x += Math.sin(p.angle) * 1.2;
+          p.angle += p.rotSpeed;
+
+          if (p.y > canvas.height + 20) {
+            p.y = -20;
+            p.x = Math.random() * canvas.width;
+          }
+        });
+      }
+
+      // 3. Stars FX with Shooting Star
+      else if (currentFx === 'stars') {
+        particles.forEach(p => {
+          const pulse = (Math.sin(Date.now() * 0.003 + p.angle) + 1) * 0.5;
+          ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity * (0.3 + 0.7 * pulse)})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * 0.8, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Occasional Shooting Star
+        if (Math.random() < 0.015 && shootingStars.length < 2) {
+          shootingStars.push({
+            x: Math.random() * canvas.width * 0.8,
+            y: Math.random() * canvas.height * 0.4,
+            len: Math.random() * 120 + 80,
+            speed: Math.random() * 12 + 10,
+            alpha: 1
+          });
+        }
+
+        shootingStars.forEach((s, idx) => {
+          ctx.strokeStyle = `rgba(255, 255, 255, ${s.alpha})`;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(s.x, s.y);
+          ctx.lineTo(s.x + s.len, s.y + s.len * 0.5);
+          ctx.stroke();
+
+          s.x += s.speed;
+          s.y += s.speed * 0.5;
+          s.alpha -= 0.03;
+          if (s.alpha <= 0) shootingStars.splice(idx, 1);
+        });
+      }
+
+      // 4. Dust Motes FX
+      else if (currentFx === 'dust') {
+        particles.forEach(p => {
+          ctx.fillStyle = `rgba(255, 220, 160, ${p.opacity * 0.6})`;
+          ctx.shadowBlur = 6;
+          ctx.shadowColor = 'rgba(255, 220, 160, 0.5)';
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * 1.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+
+          p.y -= 0.4;
+          p.x += Math.sin(p.angle) * 0.5;
+          p.angle += 0.02;
+
+          if (p.y < -10) {
+            p.y = canvas.height + 10;
+            p.x = Math.random() * canvas.width;
+          }
+        });
+      }
+
+      // 5. Autumn Leaves FX
+      else if (currentFx === 'leaves') {
+        particles.forEach(p => {
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.angle);
+          ctx.fillStyle = `rgba(224, 112, 45, ${p.opacity})`;
+          ctx.beginPath();
+          ctx.moveTo(0, -p.size * 4);
+          ctx.quadraticCurveTo(p.size * 3, 0, 0, p.size * 4);
+          ctx.quadraticCurveTo(-p.size * 3, 0, 0, -p.size * 4);
+          ctx.fill();
+          ctx.restore();
+
+          p.y += p.speedY * 0.9;
+          p.x += Math.cos(p.angle) * 1.5;
+          p.angle += p.rotSpeed * 1.2;
+
+          if (p.y > canvas.height + 20) {
+            p.y = -20;
+            p.x = Math.random() * canvas.width;
+          }
+        });
+      }
+
+      // 6. Clear Sky Gentle Orbs
+      else {
+        particles.forEach(p => {
+          ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity * 0.4})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * 2, 0, Math.PI * 2);
+          ctx.fill();
+
+          p.y -= 0.2;
+          p.x += Math.sin(p.angle) * 0.3;
+          p.angle += 0.01;
+
+          if (p.y < -10) {
+            p.y = canvas.height + 10;
+            p.x = Math.random() * canvas.width;
+          }
+        });
+      }
+
+      requestAnimationFrame(renderParticles);
+    }
+
+    // --- Audio Visualizer Mini Canvas ---
+    const visCanvas = document.getElementById('visualizer-canvas');
+    const visCtx = visCanvas.getContext('2d');
+    const BAR_COUNT = 24;
+
+    function renderVisualizer() {
+      visCtx.clearRect(0, 0, visCanvas.width, visCanvas.height);
+      const barWidth = (visCanvas.width / BAR_COUNT) - 2;
+
+      for (let i = 0; i < BAR_COUNT; i++) {
+        let barHeight = 3;
+        if (isPlaying) {
+          const time = Date.now() * 0.006;
+          barHeight = Math.abs(Math.sin(time + i * 0.4) * Math.cos(time * 0.5 + i * 0.2)) * 26 + 4;
+        }
+
+        const x = i * (barWidth + 2);
+        const y = visCanvas.height - barHeight;
+
+        const grad = visCtx.createLinearGradient(0, y, 0, visCanvas.height);
+        grad.addColorStop(0, '#00f2fe');
+        grad.addColorStop(1, '#ff2a85');
+
+        visCtx.fillStyle = grad;
+        visCtx.fillRect(x, y, barWidth, barHeight);
+      }
+
+      requestAnimationFrame(renderVisualizer);
+    }
+
+    // --- Digital Clock ---
+    function updateClock() {
+      const now = new Date();
+      const hrs = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      const secs = String(now.getSeconds()).padStart(2, '0');
+      const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+      document.getElementById('digital-clock').textContent = `${hrs}:${mins}:${secs} ${ampm}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // --- Pomodoro Timer Logic ---
+    function formatTime(totalSecs) {
+      const m = Math.floor(totalSecs / 60);
+      const s = totalSecs % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function updatePomoDisplay() {
+      const timeStr = formatTime(pomoSecondsLeft);
+      document.getElementById('pomo-display').textContent = timeStr;
+      document.getElementById('header-pomo-text').textContent = `POMO: ${timeStr}`;
+    }
+
+    function startPomodoro() {
+      if (pomoInterval) clearInterval(pomoInterval);
+      document.getElementById('pomo-start-btn').textContent = "PAUSE TIMER";
+      pomoInterval = setInterval(() => {
+        if (pomoSecondsLeft > 0) {
+          pomoSecondsLeft--;
+          updatePomoDisplay();
+        } else {
+          clearInterval(pomoInterval);
+          pomoInterval = null;
+          document.getElementById('pomo-start-btn').textContent = "START TIMER";
+          playZenBell();
+          alert(`⏰ Pomodoro ${pomoMode.toUpperCase()} finished! Great work!`);
+        }
+      }, 1000);
+    }
+
+    function pausePomodoro() {
+      if (pomoInterval) {
+        clearInterval(pomoInterval);
+        pomoInterval = null;
+        document.getElementById('pomo-start-btn').textContent = "RESUME TIMER";
+      }
+    }
+
+    function resetPomodoro(durationMinutes) {
+      pausePomodoro();
+      pomoSecondsLeft = durationMinutes * 60;
+      document.getElementById('pomo-start-btn').textContent = "START TIMER";
+      updatePomoDisplay();
+    }
+
+    // --- Retro Scratchpad & To-Do List Engine ---
+    let todos = [];
+    function loadNotesData() {
+      try {
+        const savedText = localStorage.getItem('lofi_cafe_notes');
+        if (savedText) document.getElementById('notes-textarea').value = savedText;
+
+        const savedTodos = localStorage.getItem('lofi_cafe_todos');
+        if (savedTodos) todos = JSON.parse(savedTodos);
+        renderTodos();
+      } catch (e) {}
+    }
+
+    function saveNotesData() {
+      try {
+        const text = document.getElementById('notes-textarea').value;
+        localStorage.setItem('lofi_cafe_notes', text);
+        localStorage.setItem('lofi_cafe_todos', JSON.stringify(todos));
+        const indicator = document.getElementById('notes-save-indicator');
+        indicator.textContent = '● Saved';
+        indicator.className = 'text-[9px] text-emerald-400 font-normal';
+      } catch (e) {}
+    }
+
+    function renderTodos() {
+      const container = document.getElementById('todo-list');
+      container.innerHTML = '';
+      if (todos.length === 0) {
+        container.innerHTML = '<div class="text-[11px] text-slate-500 py-2 text-center">No active tasks. Add one above!</div>';
+        return;
+      }
+      todos.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between gap-2 p-1.5 rounded-lg bg-black/30 border border-white/5 text-xs';
+        row.innerHTML = `
+          <label class="flex items-center gap-2 cursor-pointer flex-1 min-w-0">
+            <input type="checkbox" ${item.done ? 'checked' : ''} class="rounded accent-cyan-400">
+            <span class="truncate ${item.done ? 'line-through text-slate-500' : 'text-slate-200'}">${item.text}</span>
+          </label>
+          <button data-del="${idx}" class="text-slate-500 hover:text-red-400 text-xs px-1">✕</button>
+        `;
+        row.querySelector('input').addEventListener('change', (e) => {
+          todos[idx].done = e.target.checked;
+          saveNotesData();
+          renderTodos();
+        });
+        row.querySelector('button').addEventListener('click', () => {
+          todos.splice(idx, 1);
+          saveNotesData();
+          renderTodos();
+        });
+        container.appendChild(row);
+      });
+    }
+
+    // --- Idle Auto-Fade Timer ---
+    function resetIdleTimer() {
+      document.querySelectorAll('.ui-layer').forEach(el => el.classList.remove('ui-hidden'));
+
+      if (idleTimer) clearTimeout(idleTimer);
+
+      const isAnyModalOpen = !document.getElementById('station-drawer').classList.contains('translate-x-full') ||
+                            !document.getElementById('mixer-modal').classList.contains('hidden') ||
+                            !document.getElementById('pomo-modal').classList.contains('hidden') ||
+                            !document.getElementById('upload-modal').classList.contains('hidden') ||
+                            !document.getElementById('notes-widget').classList.contains('hidden') ||
+                            !document.getElementById('help-modal').classList.contains('hidden');
+
+      if (!isAnyModalOpen) {
+        idleTimer = setTimeout(() => {
+          document.querySelectorAll('.ui-layer').forEach(el => el.classList.add('ui-hidden'));
+        }, IDLE_TIMEOUT);
+      }
+    }
+
+    ['mousemove', 'mousedown', 'keydown', 'touchstart'].forEach(evt => {
+      window.addEventListener(evt, resetIdleTimer, { passive: true });
+    });
+
+    // --- EVENT LISTENERS & INITIALIZATION ---
+    function initializeApp() {
+      if (window._appInitialized) return;
+      window._appInitialized = true;
+      loadPreferences();
+      loadNotesData();
+
+      resizeCanvas();
+      renderParticles();
+      renderVisualizer();
+      renderStationList();
+      loadStation(currentStationIndex, false);
+
+      if (window.lucide) lucide.createIcons();
+
+      // PWA Install Event
+      let deferredPrompt = null;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const installBtn = document.getElementById('btn-install-pwa');
+        if (installBtn) installBtn.classList.remove('hidden');
+      });
+      document.getElementById('btn-install-pwa').addEventListener('click', async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          if (outcome === 'accepted') {
+            document.getElementById('btn-install-pwa').classList.add('hidden');
+          }
+          deferredPrompt = null;
+        }
+      });
+
+      // 1. Initial Start Overlay
+      const startOverlay = document.getElementById('start-overlay');
+      if (startOverlay) startOverlay.addEventListener('click', (e) => window.unlockAndStart(e));
+
+      // 2. Playback Controls
+      document.getElementById('btn-play-pause').addEventListener('click', togglePlayPause);
+      document.getElementById('btn-next').addEventListener('click', nextStation);
+      document.getElementById('btn-prev').addEventListener('click', prevStation);
+      document.getElementById('btn-shuffle').addEventListener('click', shuffleStation);
+      document.getElementById('vinyl-container').addEventListener('click', togglePlayPause);
+
+      // 3. Audio Mode Switch (Radio Stream vs Synth Lo-Fi)
+      document.getElementById('btn-source-mode').addEventListener('click', () => {
+        window.toggleAudioMode();
+      });
+      document.getElementById('btn-mute').addEventListener('click', () => window.toggleMute());
+
+      // 4. Volume & Mute Initial Setup
+      updateMuteIcon();
+
+      // 5. Drawer Toggles
+      document.getElementById('btn-toggle-drawer').addEventListener('click', () => toggleDrawer());
+      document.getElementById('btn-close-drawer').addEventListener('click', () => toggleDrawer(false));
+      document.getElementById('station-search').addEventListener('input', renderStationList);
+
+      // Drawer Filter Chips
+      document.querySelectorAll('#fx-filter-chips button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#fx-filter-chips button').forEach(b => {
+            b.className = 'filter-chip px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300';
+          });
+          btn.className = 'filter-chip px-3 py-1 rounded-lg bg-cyan-400 text-slate-950 font-bold';
+          activeFilter = btn.getAttribute('data-filter');
+          renderStationList();
+        });
+      });
+
+      // 6. Header Action Buttons
+      document.getElementById('btn-toggle-fx').addEventListener('click', () => {
+        weatherFxEnabled = !weatherFxEnabled;
+        document.getElementById('fx-status-text').textContent = weatherFxEnabled ? 'ON' : 'OFF';
+        savePreferences();
+      });
+
+      document.getElementById('btn-toggle-crt').addEventListener('click', () => {
+        crtEnabled = !crtEnabled;
+        const crtLayer = document.getElementById('crt-layer');
+        if (crtEnabled) {
+          crtLayer.classList.remove('hidden');
+        } else {
+          crtLayer.classList.add('hidden');
+        }
+        document.getElementById('crt-status-text').textContent = crtEnabled ? 'ON' : 'OFF';
+        savePreferences();
+      });
+
+      // Ambient Mixer Modal
+      const mixerModal = document.getElementById('mixer-modal');
+      document.getElementById('btn-toggle-mixer').addEventListener('click', () => {
+        initAudioContext();
+        mixerModal.classList.remove('hidden');
+      });
+      document.getElementById('btn-close-mixer').addEventListener('click', () => mixerModal.classList.add('hidden'));
+
+      // Ambient Sliders
+      document.getElementById('slider-rain').addEventListener('input', (e) => {
+        initAudioContext();
+        const v = parseFloat(e.target.value);
+        if (rainGain) rainGain.gain.setValueAtTime(v * 0.8, audioCtx.currentTime);
+        document.getElementById('rain-vol-label').textContent = `${Math.round(v * 100)}%`;
+        savePreferences();
+      });
+      document.getElementById('slider-vinyl').addEventListener('input', (e) => {
+        initAudioContext();
+        const v = parseFloat(e.target.value);
+        if (vinylGain) vinylGain.gain.setValueAtTime(v * 0.5, audioCtx.currentTime);
+        document.getElementById('vinyl-vol-label').textContent = `${Math.round(v * 100)}%`;
+        savePreferences();
+      });
+      document.getElementById('slider-wind').addEventListener('input', (e) => {
+        initAudioContext();
+        const v = parseFloat(e.target.value);
+        if (windGain) windGain.gain.setValueAtTime(v * 0.7, audioCtx.currentTime);
+        document.getElementById('wind-vol-label').textContent = `${Math.round(v * 100)}%`;
+        savePreferences();
+      });
+
+      document.getElementById('btn-ambient-preset').addEventListener('click', () => {
+        initAudioContext();
+        document.getElementById('slider-rain').value = 0.45;
+        document.getElementById('slider-vinyl').value = 0.35;
+        document.getElementById('slider-wind').value = 0.25;
+        if (rainGain) rainGain.gain.value = 0.36;
+        if (vinylGain) vinylGain.gain.value = 0.17;
+        if (windGain) windGain.gain.value = 0.17;
+        document.getElementById('rain-vol-label').textContent = '45%';
+        document.getElementById('vinyl-vol-label').textContent = '35%';
+        document.getElementById('wind-vol-label').textContent = '25%';
+        savePreferences();
+      });
+
+      document.getElementById('btn-ambient-mute').addEventListener('click', () => {
+        ['rain', 'vinyl', 'wind'].forEach(type => {
+          document.getElementById(`slider-${type}`).value = 0;
+          document.getElementById(`${type}-vol-label`).textContent = '0%';
+        });
+        if (rainGain) rainGain.gain.value = 0;
+        if (vinylGain) vinylGain.gain.value = 0;
+        if (windGain) windGain.gain.value = 0;
+        savePreferences();
+      });
+
+      // Pomodoro Modal
+      const pomoModal = document.getElementById('pomo-modal');
+      document.getElementById('btn-toggle-pomo').addEventListener('click', () => pomoModal.classList.remove('hidden'));
+      document.getElementById('btn-close-pomo').addEventListener('click', () => pomoModal.classList.add('hidden'));
+
+      document.getElementById('pomo-start-btn').addEventListener('click', () => {
+        if (pomoInterval) {
+          pausePomodoro();
+        } else {
+          startPomodoro();
+        }
+      });
+      document.getElementById('pomo-reset-btn').addEventListener('click', () => {
+        resetPomodoro(pomoMode === 'work' ? 25 : pomoMode === 'short' ? 5 : 15);
+      });
+
+      document.getElementById('pomo-mode-work').addEventListener('click', () => {
+        pomoMode = 'work';
+        resetPomodoro(25);
+      });
+      document.getElementById('pomo-mode-short').addEventListener('click', () => {
+        pomoMode = 'short';
+        resetPomodoro(5);
+      });
+      document.getElementById('pomo-mode-long').addEventListener('click', () => {
+        pomoMode = 'long';
+        resetPomodoro(15);
+      });
+
+      // Custom Station Uploader Modal
+      const uploadModal = document.getElementById('upload-modal');
+      document.getElementById('btn-toggle-upload').addEventListener('click', () => uploadModal.classList.remove('hidden'));
+      document.getElementById('btn-close-upload').addEventListener('click', () => uploadModal.classList.add('hidden'));
+
+      document.getElementById('custom-station-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = document.getElementById('custom-title').value;
+        const artist = document.getElementById('custom-artist').value;
+        const fx = document.getElementById('custom-fx').value;
+        const audioFile = document.getElementById('custom-audio-file').files[0];
+        const imgFile = document.getElementById('custom-image-file').files[0];
+
+        if (!audioFile) return;
+
+        const audioUrl = URL.createObjectURL(audioFile);
+        const bgUrl = imgFile ? URL.createObjectURL(imgFile) : 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop';
+
+        const newId = stations.length + 1;
+        const newTrackNum = String(newId).padStart(2, '0');
+
+        stations.push({
+          id: newId,
+          trackNum: newTrackNum,
+          title: title,
+          artist: artist,
+          vibe: 'Custom Upload',
+          fx: fx,
+          bg: bgUrl,
+          grad: 'linear-gradient(135deg, #181824 0%, #29293d 50%, #11111a 100%)',
+          audio: audioUrl
+        });
+
+        uploadModal.classList.add('hidden');
+        e.target.reset();
+        renderStationList();
+        loadStation(stations.length - 1, true);
+        alert(`🎉 Custom Station "#${newTrackNum} - ${title}" uploaded and playing!`);
+      });
+
+      // Notes Widget Controls
+      const notesWidget = document.getElementById('notes-widget');
+      document.getElementById('btn-toggle-notes').addEventListener('click', () => {
+        notesWidget.classList.toggle('hidden');
+      });
+      document.getElementById('btn-close-notes').addEventListener('click', () => {
+        notesWidget.classList.add('hidden');
+      });
+
+      document.getElementById('tab-notes-text').addEventListener('click', () => {
+        document.getElementById('tab-notes-text').className = 'flex-1 py-1 rounded-md bg-cyan-400 text-slate-950 font-bold transition';
+        document.getElementById('tab-notes-todo').className = 'flex-1 py-1 rounded-md text-slate-400 hover:text-white transition';
+        document.getElementById('view-notes-text').classList.remove('hidden');
+        document.getElementById('view-notes-todo').classList.add('hidden');
+      });
+      document.getElementById('tab-notes-todo').addEventListener('click', () => {
+        document.getElementById('tab-notes-todo').className = 'flex-1 py-1 rounded-md bg-cyan-400 text-slate-950 font-bold transition';
+        document.getElementById('tab-notes-text').className = 'flex-1 py-1 rounded-md text-slate-400 hover:text-white transition';
+        document.getElementById('view-notes-todo').classList.remove('hidden');
+        document.getElementById('view-notes-text').classList.add('hidden');
+      });
+
+      document.getElementById('notes-textarea').addEventListener('input', () => {
+        saveNotesData();
+      });
+
+      function addTodo() {
+        const input = document.getElementById('todo-input');
+        const text = input.value.trim();
+        if (text) {
+          todos.push({ text: text, done: false });
+          input.value = '';
+          saveNotesData();
+          renderTodos();
+        }
+      }
+      document.getElementById('btn-add-todo').addEventListener('click', addTodo);
+      document.getElementById('todo-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') addTodo();
+      });
+
+      document.getElementById('btn-clear-notes').addEventListener('click', () => {
+        if (confirm('Clear scratchpad and all to-do tasks?')) {
+          document.getElementById('notes-textarea').value = '';
+          todos = [];
+          saveNotesData();
+          renderTodos();
+        }
+      });
+
+      // Shortcuts Modal
+      const helpModal = document.getElementById('help-modal');
+      document.getElementById('btn-toggle-help').addEventListener('click', () => helpModal.classList.remove('hidden'));
+      document.getElementById('btn-close-help').addEventListener('click', () => helpModal.classList.add('hidden'));
+
+      // Close modals on background click
+      [mixerModal, pomoModal, uploadModal, helpModal].forEach(modal => {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) modal.classList.add('hidden');
+        });
+      });
+
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeApp);
+    } else {
+      initializeApp();
+    }
+
+    // Global Keyboard Shortcuts
+    window.addEventListener('keydown', (e) => {
+        if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+        if (e.code === 'Space') {
+          e.preventDefault();
+          togglePlayPause();
+        } else if (e.code === 'ArrowRight') {
+          e.preventDefault();
+          nextStation();
+        } else if (e.code === 'ArrowLeft') {
+          e.preventDefault();
+          prevStation();
+        } else if (e.code === 'ArrowUp') {
+          e.preventDefault();
+          setMasterVolume(masterVolume + 0.05);
+        } else if (e.code === 'ArrowDown') {
+          e.preventDefault();
+          setMasterVolume(masterVolume - 0.05);
+        } else if (e.key.toLowerCase() === 'm') {
+          toggleMute();
+        } else if (e.key.toLowerCase() === 'n') {
+          notesWidget.classList.toggle('hidden');
+        } else if (e.key.toLowerCase() === 's' || e.key.toLowerCase() === 'g') {
+          toggleDrawer();
+        } else if (e.key.toLowerCase() === 'a') {
+          mixerModal.classList.toggle('hidden');
+        } else if (e.key.toLowerCase() === 'p') {
+          pomoModal.classList.toggle('hidden');
+        } else if (e.key.toLowerCase() === 'c') {
+          document.getElementById('btn-toggle-crt').click();
+        } else if (e.key.toLowerCase() === 'f') {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+          } else {
+            document.exitFullscreen().catch(() => {});
+          }
+        } else if (e.key === '?' || e.key.toLowerCase() === 'h') {
+          helpModal.classList.toggle('hidden');
+        }
+      });
+  </script>
+</body>
+</html>
