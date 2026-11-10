@@ -302,7 +302,7 @@
   <canvas id="fx-canvas" class="absolute inset-0 pointer-events-none z-10"></canvas>
 
   <!-- CRT Scanline Overlay -->
-  <div id="crt-layer" class="crt-overlay crt-flicker fixed inset-0 pointer-events-none z-50 hidden"></div>
+  <div id="crt-layer" class="crt-overlay crt-flicker fixed inset-0 pointer-events-none z-50"></div>
 
   <!-- ========================================================================= -->
   <!-- 1. INITIAL START OVERLAY (Autoplay Policy Workaround) -->
@@ -428,7 +428,7 @@
       <button id="btn-toggle-crt" title="CRT Retro Filter Mode (C)" class="glass-button px-3 py-2 rounded-xl flex items-center gap-1.5 text-xs font-mono text-purple-300">
         <i data-lucide="tv" class="w-4 h-4"></i>
         <span class="hidden sm:inline">CRT:</span>
-        <span id="crt-status-text" class="font-bold">OFF</span>
+        <span id="crt-status-text" class="font-bold">ON</span>
       </button>
 
       <!-- Custom Station Uploader -->
@@ -1599,7 +1599,7 @@
     let isPlaying = false;
     let isSynthMode = false;
     let weatherFxEnabled = false;
-    let crtEnabled = false;
+    let crtEnabled = true;
     let masterVolume = 0.75;
     let isMuted = false;
     let activeFilter = 'all';
@@ -1828,10 +1828,10 @@
             weatherFxEnabled = prefs.weatherFxEnabled;
             document.getElementById('fx-status-text').textContent = weatherFxEnabled ? 'ON' : 'OFF';
           }
-          if (prefs.crtEnabled) {
-            crtEnabled = true;
-            document.getElementById('crt-layer').classList.remove('hidden');
-            document.getElementById('crt-status-text').textContent = 'ON';
+          if (typeof prefs.crtEnabled === 'boolean') {
+            crtEnabled = prefs.crtEnabled;
+            document.getElementById('crt-layer').classList.toggle('hidden', !crtEnabled);
+            document.getElementById('crt-status-text').textContent = crtEnabled ? 'ON' : 'OFF';
           }
           if (prefs.isSynthMode) {
             isSynthMode = true;
