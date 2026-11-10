@@ -3137,13 +3137,13 @@
         } else if (e.key.toLowerCase() === 'm') {
           toggleMute();
         } else if (e.key.toLowerCase() === 'n') {
-          notesWidget.classList.toggle('hidden');
+          document.getElementById('notes-widget').classList.toggle('hidden');
         } else if (e.key.toLowerCase() === 's' || e.key.toLowerCase() === 'g') {
           toggleDrawer();
         } else if (e.key.toLowerCase() === 'a') {
-          mixerModal.classList.toggle('hidden');
+          document.getElementById('mixer-modal').classList.toggle('hidden');
         } else if (e.key.toLowerCase() === 'p') {
-          pomoModal.classList.toggle('hidden');
+          document.getElementById('pomo-modal').classList.toggle('hidden');
         } else if (e.key.toLowerCase() === 'c') {
           document.getElementById('btn-toggle-crt').click();
         } else if (e.key.toLowerCase() === 'f') {
@@ -3153,7 +3153,7 @@
             document.exitFullscreen().catch(() => {});
           }
         } else if (e.key === '?' || e.key.toLowerCase() === 'h') {
-          helpModal.classList.toggle('hidden');
+          document.getElementById('help-modal').classList.toggle('hidden');
         }
       });
   </script>
