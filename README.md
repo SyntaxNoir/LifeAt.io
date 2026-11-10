@@ -74,7 +74,8 @@ Keyboard shortcuts are ignored while typing in text fields.
 
 - Radio audio is streamed from SomaFM; continuous availability depends on the radio provider and network connection.
 - Fonts, utility CSS, and icons load from Google Fonts, Tailwind CDN, and Lucide CDN.
-- Station artwork is loaded from remote image CDNs, including Pixabay and Unsplash.
+- The original 50 station backgrounds and thumbnails are bundled in `website/images/stations/`, so the active scene and library artwork do not depend on Unsplash at runtime.
+- The additional 50 station artworks are served by Pixabay's CDN.
 - The app has no application server or account system. Preferences, notes, and to-do items stay in browser local storage.
 - Custom station audio and images are selected locally and used in the current page session; they are not uploaded to this project or persisted as library entries.
 - A network connection is needed for hosted fonts, styles, artwork, and radio streams. The service worker does not make the radio or full site available offline.

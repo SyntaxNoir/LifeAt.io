@@ -294,7 +294,7 @@
 
   <!-- Background Wallpaper Layer -->
   <div id="bg-container" class="absolute inset-0 transition-all duration-1000"
-       style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=70&w=1600&auto=format&fit=crop'); background-size: cover; background-position: center center; background-repeat: no-repeat; filter: brightness(0.65);">
+       style="background-image: url('./images/stations/01.jpg'); background-size: cover; background-position: center center; background-repeat: no-repeat; filter: brightness(0.65);">
   </div>
   <div id="bg-overlay" class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/55 pointer-events-none"></div>
 
@@ -459,7 +459,7 @@
       <div class="flex items-center gap-3 min-w-0">
         <div id="vinyl-container" class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border border-white/15 shadow-lg cursor-pointer">
           <div id="vinyl-disc" class="w-full h-full animate-spin-slow" style="animation-play-state: paused;">
-            <img id="vinyl-artwork" src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=65&w=160&auto=format&fit=crop"
+            <img id="vinyl-artwork" src="./images/stations/thumbs/01.jpg"
                  alt="Track Artwork" class="w-full h-full object-cover">
           </div>
         </div>
@@ -1416,6 +1416,10 @@
   }
 ];
 
+    stations.slice(0, 50).forEach((station, index) => {
+      station.bg = `./images/stations/${String(index + 1).padStart(2, '0')}.jpg`;
+    });
+
     const additionalStationThemes = [
       { title: "Midnight Metro Drizzle", channel: "beatblender", vibe: "Deep-house after hours", fx: "rain", hue: 214 },
       { title: "Lanterns over the Playa", channel: "brfm", vibe: "Desert-night eclectic", fx: "stars", hue: 26 },
@@ -2354,6 +2358,11 @@
     }
 
     function getStationThumbnailUrl(src) {
+      const url = new URL(src, document.baseURI);
+      if (url.pathname.includes('/images/stations/')) {
+        url.pathname = url.pathname.replace(/\/stations\/(\d+\.jpg)$/, '/stations/thumbs/$1');
+        return url.href;
+      }
       return getStationImageUrl(src, 160, 65);
     }
 
