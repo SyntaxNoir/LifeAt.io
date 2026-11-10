@@ -476,9 +476,9 @@
         </div>
 
         <div class="flex flex-col items-end gap-1 flex-shrink-0">
-          <span id="player-track-badge" class="px-2 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-mono text-[10px] font-bold tracking-wider">
-            TRACK 01 OF 50
-          </span>
+          <button id="player-track-badge" type="button" title="Open station library" aria-label="Open station library" aria-controls="station-drawer" aria-expanded="false" class="px-2 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-mono text-[10px] font-bold tracking-wider hover:bg-cyan-500/25 transition-colors">
+            TRACK 01 OF 100
+          </button>
           <span id="player-fx-badge" class="text-[10px] text-slate-400 font-mono">
             <span id="player-fx-name">Rain FX</span>
           </span>
@@ -2439,6 +2439,11 @@
       } else {
         drawer.classList.add('translate-x-full');
       }
+      document.getElementById('btn-toggle-drawer').setAttribute('aria-expanded', String(shouldOpen));
+      const trackBadge = document.getElementById('player-track-badge');
+      trackBadge.setAttribute('aria-expanded', String(shouldOpen));
+      trackBadge.setAttribute('aria-label', `${shouldOpen ? 'Close' : 'Open'} station library`);
+      trackBadge.title = `${shouldOpen ? 'Close' : 'Open'} station library`;
     }
 
     // --- Dynamic Canvas Particle System ---
@@ -2880,6 +2885,7 @@
 
       // 5. Drawer Toggles
       document.getElementById('btn-toggle-drawer').addEventListener('click', () => toggleDrawer());
+      document.getElementById('player-track-badge').addEventListener('click', () => toggleDrawer());
       document.getElementById('btn-close-drawer').addEventListener('click', () => toggleDrawer(false));
       document.getElementById('station-search').addEventListener('input', renderStationList);
 
